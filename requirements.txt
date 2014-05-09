@@ -1,0 +1,4 @@
+django >= 1.5
+South >= 0.8.2
+httpagentparser
+django-nose
