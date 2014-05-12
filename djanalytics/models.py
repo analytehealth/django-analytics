@@ -12,6 +12,9 @@ class Client(models.Model):
     name = models.CharField(max_length=100)
     uuid = models.CharField(max_length=36, default=generate_uuid())
 
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.uuid)
+
     class Meta(object):
         app_label='djanalytics'
 
@@ -34,6 +37,9 @@ class RequestEvent(models.Model):
 class Domain(models.Model):
     pattern = models.CharField(max_length=100)
     client = models.ForeignKey(Client)
+
+    def __unicode__(self):
+        return self.pattern
 
     class Meta(object):
         app_label='djanalytics'

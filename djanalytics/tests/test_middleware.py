@@ -1,0 +1,52 @@
+import mock
+
+from django.test import TestCase
+from django.conf import settings
+from django.conf.urls import patterns, url
+from django.http.response import HttpResponse
+from djanalytics import models
+
+
+class TestMiddleware(TestCase):
+
+    def setUp(self):
+        super(TestMiddleware, self).setUp()
+        self.orig_middleware = settings.MIDDLEWARE_CLASSES
+        settings.MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES + (
+            'djanalytics.middleware.AnalyticsMiddleware',
+        )
+        models.Client.objects.create(
+            name='test',
+            uuid='test'
+        )
+
+    def tearDown(self):
+        settings.MIDDLEWARE_CLASSES = self.orig_middleware
+        super(TestMiddleware, self).tearDown()
+
+    @mock.patch(
+        'djanalytics.urls.urlpatterns',
+        patterns('', url(
+            r'$^', lambda request: HttpResponse(status=204)
+        ))
+    )
+    def test_middleware(self):
+        response = self.client.get('/')
+        tracking_id = response.client.session['dja_tracking_id']
+        self.assertIsNotNone(tracking_id)
+        event = models.RequestEvent.objects.get(tracking_key=tracking_id)
+        self.assertEqual(event.response_code, 204)
+        response = self.client.get('/')
+        self.assertEqual(
+            models.RequestEvent.objects.filter(
+                tracking_key=tracking_id
+            ).count(),
+            2
+        )
+
+    def test_request_failure(self):
+        response = self.client.get('/bogus')
+        tracking_id = response.client.session['dja_tracking_id']
+        self.assertIsNotNone(tracking_id)
+        event = models.RequestEvent.objects.get(tracking_key=tracking_id)
+        self.assertEqual(event.response_code, 404)

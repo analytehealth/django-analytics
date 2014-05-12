@@ -24,9 +24,31 @@ class TestCapture(TestCase):
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_ORIGIN='http://djanalytics.example.com',
+            data={
+                'query_key': 'query_value',
+                'another_query_key': 'another_query_value'
+            }
         )
         self.assertEqual(204, response.status_code)
-        self.assertIsNotNone(response.client.session['dja_tracking_id'])
+        tracking_id = response.client.session['dja_tracking_id']
+        event = models.RequestEvent.objects.get(tracking_key=tracking_id)
+        self.assertEquals(
+            event.query_string,
+            'query_key=query_value,another_query_key=another_query_value'
+        )
+        response = self.client.post(
+            '%s?dja_id=%s' % (
+                reverse('dja_capture', urlconf='djanalytics.urls'),
+                self.dja_client.uuid
+            ),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            HTTP_ORIGIN='http://djanalytics.example.com',
+        )
+        self.assertEquals(
+            models.RequestEvent.objects.filter(tracking_key=tracking_id).count(),
+            2
+        )
 
     def test_invalid_client_id(self):
         response = self.client.post(
