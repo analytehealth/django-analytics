@@ -33,15 +33,28 @@ class TestMiddleware(TestCase):
     def test_middleware(self):
         response = self.client.get('/')
         tracking_id = response.client.session['dja_tracking_id']
+        tracking_user_id = response.cookies.get('dja_uuid').value
         self.assertIsNotNone(tracking_id)
-        event = models.RequestEvent.objects.get(tracking_key=tracking_id)
+        event = models.RequestEvent.objects.get(
+            tracking_key=tracking_id,
+            tracking_user_id=tracking_user_id
+        )
         self.assertEqual(event.response_code, 204)
         response = self.client.get('/')
         self.assertEqual(
             models.RequestEvent.objects.filter(
-                tracking_key=tracking_id
+                tracking_key=tracking_id,
+                tracking_user_id=tracking_user_id
             ).count(),
             2
+        )
+        self.client.cookies.pop('sessionid')
+        response = self.client.get('/')
+        self.assertEqual(
+            models.RequestEvent.objects.filter(
+                tracking_user_id=tracking_user_id
+            ).count(),
+            3
         )
 
     def test_request_failure(self):

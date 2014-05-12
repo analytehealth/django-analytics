@@ -19,6 +19,7 @@ class CaptureEventView(View):
     @csrf_exempt
     def post(self, request):
         tracking_id = request.session.get('dja_tracking_id')
+        user_id = request.COOKIES.get('dja_uuid')
         try:
             origin = urlparse(request.META.get('HTTP_ORIGIN')).hostname
         except AttributeError:
@@ -47,11 +48,18 @@ class CaptureEventView(View):
             'query_string': ','.join(('%s=%s' % (k, v) for k, v in request.POST.items())),
             'method': 'GET'
         }
+        status = 201 # CREATED
         if tracking_id:
             data['tracking_key'] = tracking_id
+            status = 202 # ACCEPTED
+        if user_id:
+            data['tracking_user_id'] = user_id
+            status = 202 # ACCEPTED
         new_event = models.RequestEvent.objects.create(**data)
         if not tracking_id:
             request.session['dja_tracking_id'] = new_event.tracking_key
-        return HttpResponse(status=204)
+        response = HttpResponse(status=status)
+        response.set_cookie('dja_uuid', new_event.tracking_user_id)
+        return response
 
 capture_event = CaptureEventView.as_view()

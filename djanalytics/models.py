@@ -23,6 +23,7 @@ class RequestEvent(models.Model):
     ip_address = models.IPAddressField()
     user_agent = models.TextField(null=True, blank=True)
     tracking_key = models.CharField(max_length=36, default=generate_uuid)
+    tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
     path = models.URLField(blank=True)
     query_string = models.TextField(null=True, blank=True)
     method = models.CharField(max_length=5)
