@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from djanalytics import models
@@ -31,6 +33,7 @@ class TestCapture(TestCase):
             }
         )
         self.assertEqual(201, response.status_code)
+        data = json.loads(response.content)
         tracking_id = response.client.session['dja_tracking_id']
         tracking_user_id = response.cookies.get('dja_uuid').value
         event = models.RequestEvent.objects.get(
@@ -40,6 +43,8 @@ class TestCapture(TestCase):
             event.query_string,
             'query_key=query_value,another_query_key=another_query_value'
         )
+        self.assertEqual(data['dja_tracking_id'], event.tracking_key)
+        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
         # second request should have same tracking_id and tracking_user_id
         response = self.client.post(
@@ -52,6 +57,7 @@ class TestCapture(TestCase):
             HTTP_ORIGIN='http://djanalytics.example.com',
         )
         self.assertEqual(202, response.status_code)
+        data = json.loads(response.content)
         self.assertEqual(
             models.RequestEvent.objects.filter(
                 tracking_key=tracking_id,
@@ -59,6 +65,8 @@ class TestCapture(TestCase):
             ).count(),
             2
         )
+        self.assertEqual(data['dja_tracking_id'], event.tracking_key)
+        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
         # terminating session
         self.client.cookies.pop('sessionid')
@@ -71,11 +79,8 @@ class TestCapture(TestCase):
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_ORIGIN='http://djanalytics.example.com',
-            data={
-                'query_key': 'query_value',
-                'another_query_key': 'another_query_value'
-            }
         )
+        data = json.loads(response.content)
         self.assertEqual(202, response.status_code)
         self.assertEqual(
             models.RequestEvent.objects.filter(
@@ -83,6 +88,8 @@ class TestCapture(TestCase):
             ).count(),
             3
         )
+        self.assertNotEqual(data['dja_tracking_id'], event.tracking_key)
+        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
     def test_invalid_client_id(self):
         response = self.client.post(

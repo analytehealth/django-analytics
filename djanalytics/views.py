@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
 from djanalytics import models
+from .http import JsonHttpResponse
 
 
 class CaptureEventView(View):
@@ -58,7 +59,11 @@ class CaptureEventView(View):
         new_event = models.RequestEvent.objects.create(**data)
         if not tracking_id:
             request.session['dja_tracking_id'] = new_event.tracking_key
-        response = HttpResponse(status=status)
+        data = {
+            'dja_tracking_id': new_event.tracking_key,
+            'dja_uuid': new_event.tracking_user_id
+        }
+        response = JsonHttpResponse(content=data, status=status)
         response.set_cookie('dja_uuid', new_event.tracking_user_id)
         return response
 

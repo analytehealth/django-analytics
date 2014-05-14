@@ -3,3 +3,4 @@ South >= 0.8.2
 httpagentparser
 django-nose
 mock
+ipaddress
