@@ -26,10 +26,9 @@ class TestCapture(TestCase):
             ),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
-            HTTP_ORIGIN='http://djanalytics.example.com',
+            HTTP_REFERER='http://djanalytics.example.com',
             data={
-                'query_key': 'query_value',
-                'another_query_key': 'another_query_value'
+                'qs': 'query_key=query_value&another_query_key=another_query_value'
             }
         )
         self.assertEqual(201, response.status_code)
@@ -41,7 +40,7 @@ class TestCapture(TestCase):
             tracking_user_id=tracking_user_id)
         self.assertEqual(
             event.query_string,
-            'query_key=query_value,another_query_key=another_query_value'
+            'query_key=query_value&another_query_key=another_query_value'
         )
         self.assertEqual(data['dja_tracking_id'], event.tracking_key)
         self.assertEqual(data['dja_uuid'], event.tracking_user_id)
@@ -54,7 +53,7 @@ class TestCapture(TestCase):
             ),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
-            HTTP_ORIGIN='http://djanalytics.example.com',
+            HTTP_REFERER='http://djanalytics.example.com',
         )
         self.assertEqual(202, response.status_code)
         data = json.loads(response.content)
@@ -78,7 +77,7 @@ class TestCapture(TestCase):
             ),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
-            HTTP_ORIGIN='http://djanalytics.example.com',
+            HTTP_REFERER='http://djanalytics.example.com',
         )
         data = json.loads(response.content)
         self.assertEqual(202, response.status_code)
@@ -97,7 +96,7 @@ class TestCapture(TestCase):
                 reverse('dja_capture', urlconf='djanalytics.urls'),
                 'bogus'
             ),
-            HTTP_ORIGIN='http://djanalytics.example.com',
+            HTTP_REFERER='http://djanalytics.example.com',
         )
         self.assertEqual(403, response.status_code)
         self.assertNotIn('dja_tracking_id', response.client.session)
@@ -109,7 +108,7 @@ class TestCapture(TestCase):
                 reverse('dja_capture', urlconf='djanalytics.urls'),
                 self.dja_client.uuid
             ),
-            HTTP_ORIGIN='http://bogus.example.com',
+            HTTP_REFERER='http://bogus.example.com',
         )
         self.assertEqual(403, response.status_code)
         self.assertNotIn('dja_tracking_id', response.client.session)

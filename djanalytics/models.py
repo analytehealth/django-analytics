@@ -64,7 +64,7 @@ class Domain(models.Model):
     client = models.ForeignKey(Client)
 
     def __unicode__(self):
-        return '%s: %s' % (self.client.name, self.netmask)
+        return '%s: %s' % (self.client.name, self.pattern)
 
     class Meta(object):
         app_label='djanalytics'

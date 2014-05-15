@@ -1,0 +1,12 @@
+<script type="text/javascript">
+var qs = '';
+if (window.location.href.indexOf('?') > -1) {
+    qs = window.location.href.slice(window.location.href.indexOf('?') + 1);
+}
+$.post(
+    '/{{ dja_base_path }}/capture/?dja_id={{ dja_client_id }}',
+    {
+        'qs': qs
+    }
+);
+</script>

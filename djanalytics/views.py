@@ -1,28 +1,32 @@
 import re
 
+from datetime import datetime, timedelta
 from urlparse import urlparse
 
 from django.http.request import QueryDict
 from django.http.response import (
-    HttpResponse,
     HttpResponseForbidden,
     HttpResponseBadRequest
 )
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
-from djanalytics import models
+from . import models
 from .http import JsonHttpResponse
 
 
 class CaptureEventView(View):
 
-    @csrf_exempt
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CaptureEventView, self).dispatch(request, *args, **kwargs)
+
     def post(self, request):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
         try:
-            origin = urlparse(request.META.get('HTTP_ORIGIN')).hostname
+            origin = urlparse(request.META.get('HTTP_REFERER')).hostname
         except AttributeError:
             return HttpResponseBadRequest(content='Unable to parse HTTP_ORIGIN')
         query = QueryDict(request.META.get('QUERY_STRING'))
@@ -46,7 +50,7 @@ class CaptureEventView(View):
             'ip_address': request.META.get('REMOTE_ADDR'),
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.path,
-            'query_string': ','.join(('%s=%s' % (k, v) for k, v in request.POST.items())),
+            'query_string': request.POST.get('qs', ''),
             'method': 'GET'
         }
         status = 201 # CREATED
@@ -64,7 +68,8 @@ class CaptureEventView(View):
             'dja_uuid': new_event.tracking_user_id
         }
         response = JsonHttpResponse(content=data, status=status)
-        response.set_cookie('dja_uuid', new_event.tracking_user_id)
+        response.set_cookie('dja_uuid', new_event.tracking_user_id,
+                            expires=datetime.now() + timedelta(days=365))
         return response
 
 capture_event = CaptureEventView.as_view()
