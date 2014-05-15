@@ -7,7 +7,7 @@ from django.http.request import QueryDict
 from django.http.response import (
     HttpResponseForbidden,
     HttpResponseBadRequest
-)
+, HttpResponse)
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
@@ -45,11 +45,18 @@ class CaptureEventView(View):
                 break
             return HttpResponseForbidden(content='Invalid domain for client')
 
+        if not client.path_valid(
+            request.POST.get('pth', '')
+        ) or not client.ip_valid(
+            request.META.get('REMOTE_ADDR')
+        ):
+            return HttpResponse(status=204) # NO_CONTENT
+
         data = {
             'client': client,
             'ip_address': request.META.get('REMOTE_ADDR'),
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
-            'path': request.path,
+            'path': request.POST.get('pth', ''),
             'query_string': request.POST.get('qs', ''),
             'method': 'GET'
         }

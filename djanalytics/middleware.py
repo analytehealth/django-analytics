@@ -1,6 +1,4 @@
-from django.conf import settings
-
-from djanalytics import models
+from djanalytics import models, settings
 
 
 class AnalyticsMiddleware(object):
@@ -8,7 +6,14 @@ class AnalyticsMiddleware(object):
     def process_response(self, request, response):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
-        client = models.Client.objects.get(uuid=settings.DJANALYTICS_ID)
+        client = models.Client.objects.get(uuid=settings.CLIENT_ID)
+
+        if not client.path_valid(
+            request.path
+        ) or not client.ip_valid(
+            request.META.get('REMOTE_ADDR')
+        ):
+            return response
 
         data = {
             'client': client,

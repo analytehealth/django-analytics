@@ -28,7 +28,8 @@ class TestCapture(TestCase):
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             data={
-                'qs': 'query_key=query_value&another_query_key=another_query_value'
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
             }
         )
         self.assertEqual(201, response.status_code)
@@ -42,6 +43,7 @@ class TestCapture(TestCase):
             event.query_string,
             'query_key=query_value&another_query_key=another_query_value'
         )
+        self.assertEqual(event.path, '/')
         self.assertEqual(data['dja_tracking_id'], event.tracking_key)
         self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
@@ -54,6 +56,10 @@ class TestCapture(TestCase):
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
+            data={
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
         )
         self.assertEqual(202, response.status_code)
         data = json.loads(response.content)
@@ -78,6 +84,10 @@ class TestCapture(TestCase):
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
+            data={
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
         )
         data = json.loads(response.content)
         self.assertEqual(202, response.status_code)
@@ -109,7 +119,56 @@ class TestCapture(TestCase):
                 self.dja_client.uuid
             ),
             HTTP_REFERER='http://bogus.example.com',
+            data={
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
         )
         self.assertEqual(403, response.status_code)
         self.assertNotIn('dja_tracking_id', response.client.session)
         self.assertEqual('Invalid domain for client', response.content)
+
+    def test_filtered_ip(self):
+        models.IPFilter.objects.create(
+            client=self.dja_client,
+            netmask='127.0.0.0/24'
+        )
+        response = self.client.post(
+            '%s?dja_id=%s' % (
+                reverse('dja_capture', urlconf='djanalytics.urls'),
+                self.dja_client.uuid
+            ),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            HTTP_REFERER='http://djanalytics.example.com',
+            REMOTE_ADDR='127.0.0.1',
+            data={
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
+        )
+        self.assertEqual(204, response.status_code)
+        self.assertNotIn('dja_tracking_id', response.client.session)
+
+    def test_filtered_path(self):
+        models.PathFilter.objects.create(
+            client=self.dja_client,
+            path_pattern='^/exclude_me/.*'
+        )
+        response = self.client.post(
+            '%s?dja_id=%s' % (
+                reverse('dja_capture', urlconf='djanalytics.urls'),
+                self.dja_client.uuid
+            ),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            HTTP_REFERER='http://djanalytics.example.com',
+            REMOTE_ADDR='127.0.0.1',
+            data={
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/exclude_me/should_not_report'
+            }
+        )
+        self.assertEqual(204, response.status_code)
+        self.assertNotIn('dja_tracking_id', response.client.session)
+

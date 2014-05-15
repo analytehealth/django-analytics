@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.conf.urls import patterns, url
 from django.http.response import HttpResponse
+
 from djanalytics import models
 
 
@@ -15,7 +16,7 @@ class TestMiddleware(TestCase):
         settings.MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES + (
             'djanalytics.middleware.AnalyticsMiddleware',
         )
-        models.Client.objects.create(
+        self.dja_client = models.Client.objects.create(
             name='test',
             uuid='test'
         )
@@ -27,7 +28,7 @@ class TestMiddleware(TestCase):
     @mock.patch(
         'djanalytics.urls.urlpatterns',
         patterns('', url(
-            r'$^', lambda request: HttpResponse(status=204)
+            r'^$', lambda request: HttpResponse(status=204)
         ))
     )
     def test_middleware(self):
@@ -63,3 +64,21 @@ class TestMiddleware(TestCase):
         self.assertIsNotNone(tracking_id)
         event = models.RequestEvent.objects.get(tracking_key=tracking_id)
         self.assertEqual(event.response_code, 404)
+
+    @mock.patch(
+        'djanalytics.urls.urlpatterns',
+        patterns('', url(
+            r'^exclude_me/should_not_report',
+            lambda request: HttpResponse(status=204)
+        ))
+    )
+    def test_path_filter(self):
+        event_count = models.RequestEvent.objects.count()
+        models.PathFilter.objects.create(
+            client=self.dja_client,
+            path_pattern='^/exclude_me/.*'
+        )
+        response = self.client.get('/exclude_me/should_not_report')
+        self.assertEqual(response.status_code, 204)
+        self.assertNotIn('dja_tracking_id', response.client.session)
+        self.assertEquals(models.RequestEvent.objects.count(), event_count)
