@@ -50,7 +50,7 @@ class RequestEvent(models.Model):
     tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
     path = models.URLField(blank=True)
     query_string = models.TextField(null=True, blank=True)
-    method = models.CharField(max_length=5)
+    method = models.CharField(max_length=5, null=True, blank=True)
     datetime = models.DateTimeField(auto_now_add=True)
     response_code = models.IntegerField(null=True, blank=True)
     client = models.ForeignKey(Client)
