@@ -26,5 +26,5 @@ Capture using HTML
     document.write('<span style="display: none"><img src="' +
         url+'&pth='+window.location.pathname+
         '&qs='+
-        window.location.search.substr(window.location.search.indexOf('?')+1)+
+        escape(window.location.search.substr(window.location.search.indexOf('?')+1))+
         '"></img></span>');
