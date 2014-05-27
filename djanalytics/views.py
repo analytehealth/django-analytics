@@ -3,13 +3,11 @@ import re
 from datetime import datetime, timedelta
 from urlparse import urlparse
 
-from django.http.request import QueryDict
 from django.http.response import (
     HttpResponseForbidden,
-    HttpResponseBadRequest
-, HttpResponse)
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+    HttpResponseBadRequest,
+    HttpResponse
+)
 from django.views.generic.base import View
 
 from . import models
