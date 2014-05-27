@@ -13,6 +13,7 @@ Add to django configuration
 * Run `manage.py migrate djanalytics` to create database tables.
 * Create and configure at least one Client and Domain.
 * In urls.py, include djanalytics urls. For example:
+
     urlpatterns += patterns(
         '',
         (r'', include('djanalytics.urls'))
