@@ -18,20 +18,15 @@ from .http import JsonHttpResponse
 
 class CaptureEventView(View):
 
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super(CaptureEventView, self).dispatch(request, *args, **kwargs)
-
-    def post(self, request):
+    def get(self, request):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
         try:
             origin = urlparse(request.META.get('HTTP_REFERER')).hostname
         except AttributeError:
             return HttpResponseBadRequest(content='Unable to parse HTTP_ORIGIN')
-        query = QueryDict(request.META.get('QUERY_STRING'))
         try:
-            client_id = query['dja_id']
+            client_id = request.GET.get('dja_id')
         except KeyError:
             return HttpResponseBadRequest(content='dja_id not passed')
 
@@ -46,7 +41,7 @@ class CaptureEventView(View):
             return HttpResponseForbidden(content='Invalid domain for client')
 
         if not client.path_valid(
-            request.POST.get('pth', '')
+            request.GET.get('pth', '')
         ) or not client.ip_valid(
             request.META.get('REMOTE_ADDR')
         ):
@@ -56,8 +51,8 @@ class CaptureEventView(View):
             'client': client,
             'ip_address': request.META.get('REMOTE_ADDR'),
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
-            'path': request.POST.get('pth', ''),
-            'query_string': request.POST.get('qs', ''),
+            'path': request.GET.get('pth', ''),
+            'query_string': request.GET.get('qs', ''),
             'method': 'GET'
         }
         status = 201 # CREATED

@@ -19,15 +19,12 @@ Add to django configuration
         (r'', include('djanalytics.urls'))
     )
 
-Capture using AJAX
+Capture using HTML
 ------------------
 
     var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
-    $.post(url,
-           {
-               'pth': window.location.pathname,
-               'qs': window.location.search.substr(window.location.search.indexOf('?')+1)
-           },
-    ).fail(function() {
-        alert('Posting capture data failed');
-    });
+    document.write('<span style="display: none"><img src="' +
+        url+'&pth='+window.location.pathname+
+        '&qs='+
+        window.location.search.substr(window.location.search.indexOf('?')+1)+
+        '"></img></span>');

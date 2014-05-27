@@ -17,17 +17,15 @@ class TestCapture(TestCase):
             client=self.dja_client
         )
 
-    def test_capture_post(self):
+    def test_capture_get(self):
         # first request
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/'
             }
@@ -48,15 +46,13 @@ class TestCapture(TestCase):
         self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
         # second request should have same tracking_id and tracking_user_id
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/'
             }
@@ -76,15 +72,13 @@ class TestCapture(TestCase):
         # terminating session
         self.client.cookies.pop('sessionid')
         # third request should still have same tracking_user_id
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/'
             }
@@ -101,7 +95,7 @@ class TestCapture(TestCase):
         self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
     def test_invalid_client_id(self):
-        response = self.client.post(
+        response = self.client.get(
             '%s?dja_id=%s' % (
                 reverse('dja_capture', urlconf='djanalytics.urls'),
                 'bogus'
@@ -113,13 +107,11 @@ class TestCapture(TestCase):
         self.assertEqual('Client not found', response.content)
 
     def test_invalid_domain_id(self):
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_REFERER='http://bogus.example.com',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/'
             }
@@ -133,16 +125,14 @@ class TestCapture(TestCase):
             client=self.dja_client,
             netmask='127.0.0.0/24'
         )
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             REMOTE_ADDR='127.0.0.1',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/'
             }
@@ -155,16 +145,14 @@ class TestCapture(TestCase):
             client=self.dja_client,
             path_pattern='^/exclude_me/.*'
         )
-        response = self.client.post(
-            '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
-                self.dja_client.uuid
-            ),
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
             REMOTE_ADDR='127.0.0.1',
             data={
+                'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
                 'pth': '/exclude_me/should_not_report'
             }
