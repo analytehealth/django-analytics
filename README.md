@@ -13,23 +13,20 @@ Add to django configuration
 * Run `manage.py migrate djanalytics` to create database tables.
 * Create and configure at least one Client and Domain.
 * In urls.py, include djanalytics urls. For example:
-`
-urlpatterns += patterns(
-    '',
-    (r'', include('djanalytics.urls'))
-)
-`
+    urlpatterns += patterns(
+        '',
+        (r'', include('djanalytics.urls'))
+    )
 
 Capture using AJAX
 ------------------
-`
-var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
-$.post(url,
-       {
-           'pth': window.location.pathname,
-           'qs': window.location.search.substr(window.location.search.indexOf('?')+1)
-       },
-).fail(function() {
-    alert('Posting capture data failed');
-});
-`
+
+    var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
+    $.post(url,
+           {
+               'pth': window.location.pathname,
+               'qs': window.location.search.substr(window.location.search.indexOf('?')+1)
+           },
+    ).fail(function() {
+        alert('Posting capture data failed');
+    });
