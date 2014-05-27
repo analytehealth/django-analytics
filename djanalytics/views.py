@@ -35,6 +35,9 @@ class CaptureEventView(View):
         except models.Client.DoesNotExist:
             return HttpResponseForbidden(content='Client not found')
 
+        if not client.domain_set.exists():
+            return HttpResponseBadRequest(content='No domains found for client')
+
         for domain in client.domain_set.all():
             if re.match('.*%s$' % domain.pattern, origin, re.IGNORECASE):
                 break
