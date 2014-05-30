@@ -1,3 +1,4 @@
+import os
 import re
 
 from datetime import datetime, timedelta
@@ -11,8 +12,8 @@ from django.http.response import (
 from django.views.generic.base import View
 
 from . import models
-from .http import JsonHttpResponse
 
+TRACKING_PIXEL_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
 class CaptureEventView(View):
 
@@ -65,11 +66,8 @@ class CaptureEventView(View):
         new_event = models.RequestEvent.objects.create(**data)
         if not tracking_id:
             request.session['dja_tracking_id'] = new_event.tracking_key
-        data = {
-            'dja_tracking_id': new_event.tracking_key,
-            'dja_uuid': new_event.tracking_user_id
-        }
-        response = JsonHttpResponse(content=data, status=status)
+        img_data = file(os.path.join(TRACKING_PIXEL_PATH, 'tracking_pixel.png')).read()
+        response = HttpResponse(content=img_data, status=status, mimetype='image/png')
         response.set_cookie('dja_uuid', new_event.tracking_user_id,
                             expires=datetime.now() + timedelta(days=365))
         return response

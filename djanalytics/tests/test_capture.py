@@ -31,7 +31,6 @@ class TestCapture(TestCase):
             }
         )
         self.assertEqual(201, response.status_code)
-        data = json.loads(response.content)
         tracking_id = response.client.session['dja_tracking_id']
         tracking_user_id = response.cookies.get('dja_uuid').value
         event = models.RequestEvent.objects.get(
@@ -44,8 +43,6 @@ class TestCapture(TestCase):
         self.assertEqual(event.path, '/')
         self.assertEqual(event.domain, 'djanalytics.example.com:81')
         self.assertEqual(event.protocol, 'http')
-        self.assertEqual(data['dja_tracking_id'], event.tracking_key)
-        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
         # second request should have same tracking_id and tracking_user_id
         response = self.client.get(
@@ -60,7 +57,6 @@ class TestCapture(TestCase):
             }
         )
         self.assertEqual(202, response.status_code)
-        data = json.loads(response.content)
         self.assertEqual(
             models.RequestEvent.objects.filter(
                 tracking_key=tracking_id,
@@ -68,8 +64,6 @@ class TestCapture(TestCase):
             ).count(),
             2
         )
-        self.assertEqual(data['dja_tracking_id'], event.tracking_key)
-        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 
         # terminating session
         self.client.cookies.pop('sessionid')
@@ -85,7 +79,6 @@ class TestCapture(TestCase):
                 'pth': '/'
             }
         )
-        data = json.loads(response.content)
         self.assertEqual(202, response.status_code)
         self.assertEqual(
             models.RequestEvent.objects.filter(
@@ -93,8 +86,8 @@ class TestCapture(TestCase):
             ).count(),
             3
         )
-        self.assertNotEqual(data['dja_tracking_id'], event.tracking_key)
-        self.assertEqual(data['dja_uuid'], event.tracking_user_id)
+        self.assertNotEqual(tracking_id, response.client.session['dja_tracking_id'],
+            'New tracking id should be in session')
 
     def test_invalid_client_id(self):
         response = self.client.get(
