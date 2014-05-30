@@ -48,10 +48,12 @@ class RequestEvent(models.Model):
     user_agent = models.TextField(null=True, blank=True)
     tracking_key = models.CharField(max_length=36, default=generate_uuid)
     tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
+    protocol = models.CharField(max_length=10)
+    domain = models.CharField(max_length=100)
     path = models.URLField(blank=True)
     query_string = models.TextField(null=True, blank=True)
     method = models.CharField(max_length=5, null=True, blank=True)
-    datetime = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
     response_code = models.IntegerField(null=True, blank=True)
     client = models.ForeignKey(Client)
 

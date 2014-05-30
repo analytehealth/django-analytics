@@ -19,10 +19,8 @@ class CaptureEventView(View):
     def get(self, request):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
-        try:
-            origin = urlparse(request.META.get('HTTP_REFERER')).hostname
-        except AttributeError:
-            return HttpResponseBadRequest(content='Unable to parse HTTP_ORIGIN')
+        parsed_url = urlparse(request.META.get('HTTP_REFERER', ''))
+        origin = parsed_url.hostname
         try:
             client_id = request.GET.get('dja_id')
         except KeyError:
@@ -49,6 +47,8 @@ class CaptureEventView(View):
             return HttpResponse(status=204) # NO_CONTENT
 
         data = {
+            'domain': parsed_url.netloc,
+            'protocol': parsed_url.scheme,
             'client': client,
             'ip_address': request.META.get('REMOTE_ADDR'),
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),

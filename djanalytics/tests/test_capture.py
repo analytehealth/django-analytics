@@ -23,7 +23,7 @@ class TestCapture(TestCase):
             reverse('dja_capture', urlconf='djanalytics.urls'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
-            HTTP_REFERER='http://djanalytics.example.com',
+            HTTP_REFERER='http://djanalytics.example.com:81',
             data={
                 'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
@@ -42,6 +42,8 @@ class TestCapture(TestCase):
             'query_key=query_value&another_query_key=another_query_value'
         )
         self.assertEqual(event.path, '/')
+        self.assertEqual(event.domain, 'djanalytics.example.com:81')
+        self.assertEqual(event.protocol, 'http')
         self.assertEqual(data['dja_tracking_id'], event.tracking_key)
         self.assertEqual(data['dja_uuid'], event.tracking_user_id)
 

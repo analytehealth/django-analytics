@@ -1,8 +1,9 @@
 <script type="text/javascript">
-    var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
-    document.write('<span style="display: none"><img src="' +
-        url+'&pth='+window.location.pathname+
-        '&qs='+
-        escape(window.location.search.substr(window.location.search.indexOf('?')+1))+
+    var url = '{{ dja_base_path }}/capture/';
+    document.write('<span style="display: none"><img src="' + url +
+        '?dja_id={{ dja_client_id }}' +
+        '&pth=' + window.location.pathname +
+        '&qs=' +
+        escape(window.location.search.substr(window.location.search.indexOf('?')+1)) +
         '"></img></span>');
 </script>
