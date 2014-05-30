@@ -1,13 +1,8 @@
 <script type="text/javascript">
-var qs = document.location.search;
-if (qs.startsWith('?')) {
-    qs = qs.slice(1);
-}
-$.post(
-    '/{{ dja_base_path }}/capture/?dja_id={{ dja_client_id }}',
-    {
-        'qs': document.location.search,
-        'pth': document.location.pathname
-    }
-);
+    var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
+    document.write('<span style="display: none"><img src="' +
+        url+'&pth='+window.location.pathname+
+        '&qs='+
+        escape(window.location.search.substr(window.location.search.indexOf('?')+1))+
+        '"></img></span>');
 </script>
