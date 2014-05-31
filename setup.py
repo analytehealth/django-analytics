@@ -5,10 +5,11 @@ setup(
     name='django-analytics',
     version='dev',
     author='Analyte Health',
-    packages=find_packages(exclude=('test',)),
+    packages=find_packages(exclude=('tests',)),
     package_data={
         'templates': '*',
     },
+    include_package_data=True,
     description='Django app to capture, track and display site analytics',
     long_description=open('README.md').read(),
     install_requires=[
