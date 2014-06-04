@@ -38,7 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django_nose',
     'south',
-    'djanalytics'
+    'djanalytics',
+    'graphos'
 )
 
 MIDDLEWARE_CLASSES = (

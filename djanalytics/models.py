@@ -1,9 +1,11 @@
-import uuid
-
-from django.db import models
+import datetime
 import ipaddress
 import re
+import uuid
 
+from django.conf import settings
+from django.db import models
+from django.db.models.query import QuerySet
 
 def generate_uuid():
     '''Generate a nice unique number (str).'''
@@ -43,8 +45,38 @@ class Client(models.Model):
         app_label='djanalytics'
 
 
+DATE_FORMAT_STRINGS = {
+    'django.db.backends.mysql': "DATE_FORMAT({}, '%%Y-%%m-%%d')",
+    'django.db.backends.postgresql.psycopg2': "to_char({}, 'yyyy-mm-dd')",
+    'django.db.backends.sqlite3': "strftime('%%Y-%%m-%%d', {})"
+}
+
+
+class RequestEventQuerySet(QuerySet):
+
+    def with_created_date(self):
+        if hasattr(settings, 'DATABASES'):
+            engine = settings.DATABASES[self.db]['ENGINE']
+        else:
+            engine = settings.DATABASE_ENGINE
+        return self.extra(
+            select={
+                'created_date':
+                    DATE_FORMAT_STRINGS[engine].format('djanalytics_requestevent.created')
+            }
+        )
+
+
+class RequestEventManager(models.Manager):
+
+    def get_query_set(self):
+        return RequestEventQuerySet(self.model, using=self._db)
+
+    def with_created_date(self):
+        return self.get_query_set().with_created_date()
+
 class RequestEvent(models.Model):
-    ip_address = models.IPAddressField()
+    ip_address = models.IPAddressField(db_index=True)
     user_agent = models.TextField(null=True, blank=True)
     tracking_key = models.CharField(max_length=36, default=generate_uuid)
     tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
@@ -53,9 +85,11 @@ class RequestEvent(models.Model):
     path = models.URLField(blank=True)
     query_string = models.TextField(null=True, blank=True)
     method = models.CharField(max_length=5, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=datetime.date.today(), db_index=True)
     response_code = models.IntegerField(null=True, blank=True)
     client = models.ForeignKey(Client)
+
+    objects = RequestEventManager()
 
     class Meta(object):
         app_label='djanalytics'

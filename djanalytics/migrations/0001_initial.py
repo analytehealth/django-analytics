@@ -12,23 +12,23 @@ class Migration(SchemaMigration):
         db.create_table(u'djanalytics_client', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('uuid', self.gf('django.db.models.fields.CharField')(default='2224058d-ac57-4aa1-a2a2-d9c317781816', max_length=36)),
+            ('uuid', self.gf('django.db.models.fields.CharField')(default='4c876504-ae19-44c3-83e1-ae7c9c60db78', max_length=36)),
         ))
         db.send_create_signal('djanalytics', ['Client'])
 
         # Adding model 'RequestEvent'
         db.create_table(u'djanalytics_requestevent', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('ip_address', self.gf('django.db.models.fields.IPAddressField')(max_length=15)),
+            ('ip_address', self.gf('django.db.models.fields.IPAddressField')(max_length=15, db_index=True)),
             ('user_agent', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('tracking_key', self.gf('django.db.models.fields.CharField')(default='92cd6cf7-b8d1-444c-a7f3-be06b26a0668', max_length=36)),
-            ('tracking_user_id', self.gf('django.db.models.fields.CharField')(default='9ee6c8d8-a103-48ff-95f5-ea8c72b2a502', max_length=36)),
+            ('tracking_key', self.gf('django.db.models.fields.CharField')(default='64f280b1-08ba-4342-8e5a-c867cb7b78a4', max_length=36)),
+            ('tracking_user_id', self.gf('django.db.models.fields.CharField')(default='5bcd7737-4707-419c-a3cd-95cef9a8a2c7', max_length=36)),
             ('protocol', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('domain', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('path', self.gf('django.db.models.fields.URLField')(max_length=200, blank=True)),
             ('query_string', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('method', self.gf('django.db.models.fields.CharField')(max_length=5, null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 4, 0, 0), db_index=True)),
             ('response_code', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('client', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['djanalytics.Client'])),
         ))
@@ -83,7 +83,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Client'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'2224058d-ac57-4aa1-a2a2-d9c317781816'", 'max_length': '36'})
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'4c876504-ae19-44c3-83e1-ae7c9c60db78'", 'max_length': '36'})
         },
         'djanalytics.domain': {
             'Meta': {'object_name': 'Domain'},
@@ -108,17 +108,17 @@ class Migration(SchemaMigration):
         'djanalytics.requestevent': {
             'Meta': {'object_name': 'RequestEvent'},
             'client': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['djanalytics.Client']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 4, 0, 0)', 'db_index': 'True'}),
             'domain': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ip_address': ('django.db.models.fields.IPAddressField', [], {'max_length': '15'}),
+            'ip_address': ('django.db.models.fields.IPAddressField', [], {'max_length': '15', 'db_index': 'True'}),
             'method': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
             'path': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'query_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'response_code': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'tracking_key': ('django.db.models.fields.CharField', [], {'default': "'b8248bc2-3fb3-4f66-a3a0-0fc07717d255'", 'max_length': '36'}),
-            'tracking_user_id': ('django.db.models.fields.CharField', [], {'default': "'518e6b4a-2970-4c52-9c78-7728acd79710'", 'max_length': '36'}),
+            'tracking_key': ('django.db.models.fields.CharField', [], {'default': "'08143bfc-9f50-4c48-92d9-39ae09b7d09e'", 'max_length': '36'}),
+            'tracking_user_id': ('django.db.models.fields.CharField', [], {'default': "'2facd44d-8cf3-4bc1-9e32-fbe3c2796090'", 'max_length': '36'}),
             'user_agent': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
         }
     }

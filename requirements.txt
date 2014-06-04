@@ -4,3 +4,5 @@ httpagentparser
 django-nose
 mock
 ipaddress
+python-dateutil
+django-graphos
