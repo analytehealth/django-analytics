@@ -5,7 +5,7 @@ Django app to capture, track and display site analytics
 
 Install
 -------
-pip install djanalytics
+pip install dj-analytics
 
 Add to django configuration
 ---------------------------
