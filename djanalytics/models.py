@@ -85,7 +85,7 @@ class RequestEvent(models.Model):
     path = models.URLField(blank=True)
     query_string = models.TextField(null=True, blank=True)
     method = models.CharField(max_length=5, null=True, blank=True)
-    created = models.DateTimeField(default=datetime.date.today(), db_index=True)
+    created = models.DateTimeField(default=datetime.datetime.now(), db_index=True)
     response_code = models.IntegerField(null=True, blank=True)
     client = models.ForeignKey(Client)
 
