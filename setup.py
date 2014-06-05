@@ -2,7 +2,7 @@ from distutils.core import setup
 from setuptools import find_packages
 
 setup(
-    name='django-analytics',
+    name='djanalytics',
     version=0.1,
     author='Analyte Health',
     author_email='tech@analytehealth.com',
