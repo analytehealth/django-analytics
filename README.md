@@ -5,7 +5,7 @@ Django app to capture, track and display site analytics
 
 Install
 -------
-pip install git://github.com/analytehealth/django-analytics@0.1
+pip install django-analytics
 
 Add to django configuration
 ---------------------------

@@ -3,8 +3,11 @@ from setuptools import find_packages
 
 setup(
     name='django-analytics',
-    version='dev',
+    version=0.1,
     author='Analyte Health',
+    author_email='tech@analytehealth.com',
+    url='https://github.com/analytehealth/django-analytics',
+    download_url='https://github.com/analytehealth/django-analytics/archive/0.1.tar.gz',
     packages=find_packages(exclude=('*.tests',)),
     package_data={
         'djanalytics': [
