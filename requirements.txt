@@ -5,4 +5,4 @@ django-nose
 mock
 ipaddress
 python-dateutil
-django-graphos
+django-graphos==0.0.2a0
