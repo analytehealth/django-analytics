@@ -36,3 +36,20 @@ Capture using HTML
         '" style="position:absolute; left: -999px"></img>";
     document.write(img_html);
 
+License
+-------
+[Read it here](https://raw.githubusercontent.com/analytehealth/django-analytics/master/LICENSE)
+
+Change Log
+----------
+- 0.3
+  - Added 'referrer' to RequestEvent model
+  - Added more indexes to RequestEvent model
+  - Added middleware documentation to README
+
+- 0.2
+  - Switched default for RequestEvent created field to 'now()' instead of 'today()'
+
+- 0.1
+  - Initial version
+
