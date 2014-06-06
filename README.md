@@ -1,3 +1,5 @@
+[![build-status-image]][travis]
+
 django-analytics
 ================
 
