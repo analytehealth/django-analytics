@@ -21,6 +21,7 @@ class AnalyticsMiddleware(object):
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.path,
             'query_string': request.META.get('QUERY_STRING'),
+            'referrer': request.META.get('HTTP_REFERER'),
             'method': request.method,
             'response_code': response.status_code
         }

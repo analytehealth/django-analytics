@@ -55,6 +55,7 @@ class CaptureEventView(View):
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.GET.get('pth', ''),
             'query_string': request.GET.get('qs', ''),
+            'referrer': request.GET.get('rf', ''),
         }
         status = 201 # CREATED
         if tracking_id:

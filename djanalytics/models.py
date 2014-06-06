@@ -42,7 +42,7 @@ class Client(models.Model):
         return '%s (%s)' % (self.name, self.uuid)
 
     class Meta(object):
-        app_label='djanalytics'
+        app_label = 'djanalytics'
 
 
 DATE_FORMAT_STRINGS = {
@@ -81,18 +81,20 @@ class RequestEvent(models.Model):
     tracking_key = models.CharField(max_length=36, default=generate_uuid)
     tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
     protocol = models.CharField(max_length=10)
-    domain = models.CharField(max_length=100)
-    path = models.URLField(blank=True)
+    domain = models.CharField(max_length=100, db_index=True)
+    path = models.URLField(blank=True, db_index=True)
     query_string = models.TextField(null=True, blank=True)
-    method = models.CharField(max_length=5, null=True, blank=True)
+    method = models.CharField(max_length=5, null=True, blank=True, db_index=True)
+    referrer = models.URLField(blank=True, null=True, db_index=True)
     created = models.DateTimeField(default=datetime.datetime.now(), db_index=True)
-    response_code = models.IntegerField(null=True, blank=True)
+    response_code = models.IntegerField(null=True, blank=True, db_index=True)
     client = models.ForeignKey(Client)
 
     objects = RequestEventManager()
 
     class Meta(object):
-        app_label='djanalytics'
+        app_label = 'djanalytics'
+        get_latest_by = 'created'
 
 
 class Domain(models.Model):
@@ -103,7 +105,7 @@ class Domain(models.Model):
         return '%s: %s' % (self.client.name, self.pattern)
 
     class Meta(object):
-        app_label='djanalytics'
+        app_label = 'djanalytics'
 
 
 class IPFilter(models.Model):
@@ -121,7 +123,7 @@ class IPFilter(models.Model):
         return '%s: %s' % (self.client.name, self.netmask)
 
     class Meta(object):
-        app_label='djanalytics'
+        app_label = 'djanalytics'
 
 
 class PathFilter(models.Model):
@@ -138,5 +140,5 @@ class PathFilter(models.Model):
         return '%s: %s' % (self.client.name, self.path_pattern)
 
     class Meta(object):
-        app_label='djanalytics'
+        app_label = 'djanalytics'
 

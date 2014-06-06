@@ -1,5 +1,3 @@
-import json
-
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from djanalytics import models
@@ -53,7 +51,8 @@ class TestCapture(TestCase):
             data={
                 'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
-                'pth': '/'
+                'pth': '/another_page',
+                'rf': '/'
             }
         )
         self.assertEqual(202, response.status_code)
@@ -63,6 +62,13 @@ class TestCapture(TestCase):
                 tracking_user_id=tracking_user_id
             ).count(),
             2
+        )
+        self.assertEqual(
+            models.RequestEvent.objects.filter(
+                tracking_key=tracking_id,
+                tracking_user_id=tracking_user_id
+            ).latest().referrer,
+            '/'
         )
 
         # terminating session

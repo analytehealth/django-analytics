@@ -19,12 +19,20 @@ Add to django configuration
         (r'', include('djanalytics.urls'))
     )
 
+Use middleware
+--------------
+
+In settings.py, add 'djanalytics.middleware.AnalyticsMiddleware' to the MIDDLEWARE_CLASSES setting
+for your django project.
+
 Capture using HTML
 ------------------
 
-    var url = 'http://dja_server.example.com/capture/?dja_id=[client uuid]';
-    document.write('<span style="display: none"><img src="' +
-        url+'&pth='+window.location.pathname+
-        '&qs='+
-        escape(window.location.search.substr(window.location.search.indexOf('?')+1))+
-        '"></img></span>');
+    var img_html = '<img src="http://dja_server.example.com/capture/' +
+        '?dja_id=[client uuid]' +
+        '&pth=' + escape(window.location.pathname) +
+        '&qs=' + escape(window.location.search.substr(window.location.search.indexOf('?')+1)) +
+        '&rf=' + escape(document.referrer) +
+        '" style="position:absolute; left: -999px"></img>";
+    document.write(img_html);
+

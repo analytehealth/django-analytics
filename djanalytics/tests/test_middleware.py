@@ -82,3 +82,15 @@ class TestMiddleware(TestCase):
         self.assertEqual(response.status_code, 204)
         self.assertNotIn('dja_tracking_id', response.client.session)
         self.assertEquals(models.RequestEvent.objects.count(), event_count)
+
+    def test_referrer(self):
+        response = self.client.get('/info', HTTP_REFERER='/')
+        tracking_id = response.client.session['dja_tracking_id']
+        tracking_user_id = response.cookies.get('dja_uuid').value
+        self.assertIsNotNone(tracking_id)
+        event = models.RequestEvent.objects.get(
+            tracking_key=tracking_id,
+            tracking_user_id=tracking_user_id
+        )
+        self.assertEqual(event.response_code, 404)
+        self.assertEqual(event.referrer, '/')
