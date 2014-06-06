@@ -166,6 +166,6 @@ class TestCapture(TestCase):
         self.assertEqual(204, response.status_code)
         self.assertNotIn(
             'dja_tracking_id', response.client.session,
-            'Expected 204 (no content) because ip should be excluded.'
+            'Expected 204 (no content) because path should be excluded.'
             'Got %s instead' % response.status_code)
 

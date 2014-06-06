@@ -76,10 +76,15 @@ class TestMiddleware(TestCase):
         event_count = models.RequestEvent.objects.count()
         models.PathFilter.objects.create(
             client=self.dja_client,
-            path_pattern='^/exclude_me/.*'
+            path_pattern='^/exclude_me/.*',
+            include=False
         )
         response = self.client.get('/exclude_me/should_not_report')
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            response.status_code, 204,
+            'Expected 204 (no content) because path should be excluded. '
+            'Got %s instead' % response.status_code
+        )
         self.assertNotIn('dja_tracking_id', response.client.session)
         self.assertEquals(models.RequestEvent.objects.count(), event_count)
 
