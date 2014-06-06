@@ -1,4 +1,4 @@
-![Travis CI Build Status](https://travis-ci.org/analytehealth/django-analytics.svg?branch=development)
+[![Travis CI Build Status](https://travis-ci.org/analytehealth/django-analytics.svg?branch=development)](https://travis-ci.org/analytehealth/django-analytics)
 
 django-analytics
 ================
