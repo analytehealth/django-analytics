@@ -6,4 +6,8 @@ install:
   - export PYTHONPATH=.
 script:
   - python djanalytics/tests/django-admin.py test --settings=djanalytics.tests.settings
+notifications:
+  email:
+    recipients:
+      - tech@analytehealth.com
 
