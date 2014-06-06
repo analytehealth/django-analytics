@@ -124,7 +124,8 @@ class TestCapture(TestCase):
     def test_filtered_ip(self):
         models.IPFilter.objects.create(
             client=self.dja_client,
-            netmask='127.0.0.0/24'
+            netmask='127.0.0.0/24',
+            include=False,
         )
         response = self.client.get(
             reverse('dja_capture', urlconf='djanalytics.urls'),
@@ -138,13 +139,17 @@ class TestCapture(TestCase):
                 'pth': '/'
             }
         )
-        self.assertEqual(204, response.status_code)
+        self.assertEqual(
+            204, response.status_code,
+            'Expected 204 (no content) because ip should be excluded. '
+            'Got %s instead' % response.status_code)
         self.assertNotIn('dja_tracking_id', response.client.session)
 
     def test_filtered_path(self):
         models.PathFilter.objects.create(
             client=self.dja_client,
-            path_pattern='^/exclude_me/.*'
+            path_pattern='^/exclude_me/.*',
+            include=False,
         )
         response = self.client.get(
             reverse('dja_capture', urlconf='djanalytics.urls'),
@@ -159,5 +164,8 @@ class TestCapture(TestCase):
             }
         )
         self.assertEqual(204, response.status_code)
-        self.assertNotIn('dja_tracking_id', response.client.session)
+        self.assertNotIn(
+            'dja_tracking_id', response.client.session,
+            'Expected 204 (no content) because ip should be excluded.'
+            'Got %s instead' % response.status_code)
 
