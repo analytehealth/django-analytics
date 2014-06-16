@@ -44,6 +44,10 @@ License
 
 Change Log
 ----------
+- 0.4
+  - Switched version of django-graphos to fix install issue
+  - Added in files for Travis CI
+
 - 0.3
   - Added 'referrer' to RequestEvent model
   - Added more indexes to RequestEvent model
