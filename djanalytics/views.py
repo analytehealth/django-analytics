@@ -21,7 +21,7 @@ class CaptureEventView(View):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
         parsed_url = urlparse(request.META.get('HTTP_REFERER', ''))
-        origin = parsed_url.hostname
+        origin = parsed_url.hostname or ''
         try:
             client_id = request.GET.get('dja_id')
         except KeyError:

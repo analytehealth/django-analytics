@@ -44,6 +44,9 @@ License
 
 Change Log
 ----------
+- 0.5
+  - Fix for issue #1 - capture view raises TypeError
+
 - 0.4
   - Switched version of django-graphos to fix install issue
   - Added in files for Travis CI

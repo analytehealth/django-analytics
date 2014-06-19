@@ -169,3 +169,22 @@ class TestCapture(TestCase):
             'Expected 204 (no content) because path should be excluded.'
             'Got %s instead' % response.status_code)
 
+    def test_no_referrer(self):
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            data={
+                'dja_id': self.dja_client.uuid,
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
+        )
+        self.assertEqual(
+            403, response.status_code, 'Expected a FORBIDDEN (403) '
+            'but got %s instead' % response.status_code
+        )
+        self.assertNotIn(
+            'dja_tracking_id', response.client.session,
+            'Expected 204 (no content) because path should be excluded.'
+            'Got %s instead' % response.status_code)
