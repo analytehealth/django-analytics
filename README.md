@@ -46,6 +46,7 @@ Change Log
 ----------
 - 0.5
   - Fix for issue #1 - capture view raises TypeError
+  - Fix for issue #2 - allow for use of HTTP_X_FORWARDED_FOR header
 
 - 0.4
   - Switched version of django-graphos to fix install issue

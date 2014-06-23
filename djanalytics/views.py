@@ -12,6 +12,7 @@ from django.http.response import (
 from django.views.generic.base import View
 
 from . import models
+from django.conf import settings
 
 TRACKING_PIXEL_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
@@ -40,11 +41,17 @@ class CaptureEventView(View):
                 break
             return HttpResponseForbidden(content='Invalid domain for client')
 
+        if settings.USE_X_FORWARDED_HOST:
+            client_ip = request.META.get(
+                'HTTP_X_FORWARDED_FOR',
+                request.META.get('REMOTE_ADDR', '')
+            )
+        else:
+            client_ip = request.META.get('REMOTE_ADDR')
+
         if not client.path_valid(
             request.GET.get('pth', '')
-        ) or not client.ip_valid(
-            request.META.get('REMOTE_ADDR')
-        ):
+        ) or not client.ip_valid(client_ip):
             return HttpResponse(status=204) # NO_CONTENT
 
         data = {
