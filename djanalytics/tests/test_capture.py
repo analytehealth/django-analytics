@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from djanalytics import models
+from mock import patch
 
 
 class TestCapture(TestCase):
@@ -188,3 +189,26 @@ class TestCapture(TestCase):
             'dja_tracking_id', response.client.session,
             'Expected 204 (no content) because path should be excluded.'
             'Got %s instead' % response.status_code)
+
+    @patch('django.conf.settings.USE_X_FORWARDED_HOST', True, create=True)
+    def test_x_forwarded_header(self):
+        response = self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            HTTP_REFERER='http://djanalytics.example.com:81',
+            HTTP_X_FORWARDED_FOR='192.168.254.254',
+            REMOTE_ADDR='1.1.1.1',
+            data={
+                'dja_id': self.dja_client.uuid,
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/'
+            }
+        )
+        self.assertEqual(201, response.status_code)
+        tracking_id = response.client.session['dja_tracking_id']
+        tracking_user_id = response.cookies.get('dja_uuid').value
+        event = models.RequestEvent.objects.get(
+            tracking_key=tracking_id,
+            tracking_user_id=tracking_user_id)
+        self.assertEqual('192.168.254.254', event.ip_address)

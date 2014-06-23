@@ -58,7 +58,7 @@ class CaptureEventView(View):
             'domain': parsed_url.netloc,
             'protocol': parsed_url.scheme,
             'client': client,
-            'ip_address': request.META.get('REMOTE_ADDR'),
+            'ip_address': client_ip,
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.GET.get('pth', ''),
             'query_string': request.GET.get('qs', ''),
