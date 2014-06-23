@@ -190,7 +190,7 @@ class TestCapture(TestCase):
             'Expected 204 (no content) because path should be excluded.'
             'Got %s instead' % response.status_code)
 
-    @patch('django.conf.settings.USE_X_FORWARDED_HOST', True, create=True)
+    @patch('django.conf.settings.USE_X_FORWARDED_HOST', True)
     def test_x_forwarded_header(self):
         response = self.client.get(
             reverse('dja_capture', urlconf='djanalytics.urls'),
