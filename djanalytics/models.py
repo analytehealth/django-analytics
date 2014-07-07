@@ -75,6 +75,12 @@ class RequestEventManager(models.Manager):
     def with_created_date(self):
         return self.get_query_set().with_created_date()
 
+class Location(models.Model):
+    postal_code = models.CharField(max_length=25, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+
 class RequestEvent(models.Model):
     ip_address = models.IPAddressField(db_index=True)
     user_agent = models.TextField(null=True, blank=True)
@@ -89,6 +95,7 @@ class RequestEvent(models.Model):
     created = models.DateTimeField(default=datetime.datetime.now(), db_index=True)
     response_code = models.IntegerField(null=True, blank=True, db_index=True)
     client = models.ForeignKey(Client)
+    location = models.ForeignKey(Location, null=True, blank=True)
 
     objects = RequestEventManager()
 

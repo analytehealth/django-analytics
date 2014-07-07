@@ -44,6 +44,10 @@ License
 
 Change Log
 ----------
+- 0.6
+  - Added Location model object. This will allow geocoding of IP addresses on a periodic basis,
+    since IP addresses change over time.
+ 
 - 0.5
   - Fix for issue #1 - capture view raises TypeError
   - Fix for issue #2 - allow for use of HTTP_X_FORWARDED_FOR header
