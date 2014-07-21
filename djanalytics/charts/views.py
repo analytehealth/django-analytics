@@ -73,7 +73,7 @@ class UserChart(DateRangeChartView):
 
     def get_context_data(self, **kwargs):
         context_data = super(UserChart, self).get_context_data(**kwargs)
-        data = [ ('Date', 'Sessions Created') ]
+        data = [ ('Date', 'Users Created') ]
         date_dict = defaultdict(int)
         for row in models.RequestEvent.objects.values(
             'tracking_user_id'
