@@ -36,9 +36,12 @@ class CaptureEventView(View):
         if not client.domain_set.exists():
             return HttpResponseBadRequest(content='No domains found for client')
 
+        domain_found = False
         for domain in client.domain_set.all():
             if re.match('.*%s$' % domain.pattern, origin, re.IGNORECASE):
+                domain_found = True
                 break
+        if not domain_found:
             return HttpResponseForbidden(content='Invalid domain for client')
 
         if settings.USE_X_FORWARDED_HOST:

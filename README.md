@@ -44,6 +44,9 @@ License
 
 Change Log
 ----------
+- 0.7
+  - Fix for issue #3 - logic for determining valid domain in capture view is wrong.
+
 - 0.6
   - Added Location model object. This will allow geocoding of IP addresses on a periodic basis,
     since IP addresses change over time.
