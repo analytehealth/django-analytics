@@ -44,6 +44,9 @@ License
 
 Change Log
 ----------
+- 0.7.1
+  - Fix for issue #5 - Created date on RequestEvent is storing the wrong date
+
 - 0.7
   - Fix for issue #3 - logic for determining valid domain in capture view is wrong.
 
