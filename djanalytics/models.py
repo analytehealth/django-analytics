@@ -92,7 +92,7 @@ class RequestEvent(models.Model):
     query_string = models.TextField(null=True, blank=True)
     method = models.CharField(max_length=5, null=True, blank=True, db_index=True)
     referrer = models.URLField(blank=True, null=True, db_index=True)
-    created = models.DateTimeField(default=datetime.datetime.now(), db_index=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     response_code = models.IntegerField(null=True, blank=True, db_index=True)
     client = models.ForeignKey(Client)
     location = models.ForeignKey(Location, null=True, blank=True)
