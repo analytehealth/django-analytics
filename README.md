@@ -46,6 +46,8 @@ Change Log
 ----------
 - 0.8
   - Corrected name of user chart.
+  - Added try / except block around middleware to avoid 500 error when
+    client doesn't exist or can't be found.
 
 - 0.7.1
   - Fix for issue #5 - Created date on RequestEvent is storing the wrong date

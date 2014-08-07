@@ -1,4 +1,5 @@
 from djanalytics import models, settings
+import logging
 
 
 class AnalyticsMiddleware(object):
@@ -6,7 +7,14 @@ class AnalyticsMiddleware(object):
     def process_response(self, request, response):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
-        client = models.Client.objects.get(uuid=settings.CLIENT_ID)
+        try:
+            client_id = getattr(settings, 'CLIENT_ID', '')
+            client = models.Client.objects.get(uuid=client_id)
+        except models.Client.DoesNotExist:
+            logging.getLogger('djanalytics').exception(
+                'Client %s does not exist', client_id
+            )
+            return response
 
         if not client.path_valid(
             request.path
