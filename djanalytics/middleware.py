@@ -1,5 +1,8 @@
-from djanalytics import models, settings
 import logging
+
+from django.conf import settings
+
+from djanalytics import models
 
 
 class AnalyticsMiddleware(object):
@@ -8,7 +11,7 @@ class AnalyticsMiddleware(object):
         tracking_id = request.session.get('dja_tracking_id')
         user_id = request.COOKIES.get('dja_uuid')
         try:
-            client_id = getattr(settings, 'CLIENT_ID', '')
+            client_id = getattr(settings, 'DJA_CLIENT_ID', '')
             client = models.Client.objects.get(uuid=client_id)
         except models.Client.DoesNotExist:
             logging.getLogger('djanalytics').exception(
