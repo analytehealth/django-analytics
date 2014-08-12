@@ -34,6 +34,7 @@ class AnalyticsMiddleware(object):
             'query_string': request.META.get('QUERY_STRING'),
             'referrer': request.META.get('HTTP_REFERER', '')[:500],
             'method': request.method,
+            'domain': request.META.get('HTTP_HOST', ''),
             'response_code': response.status_code
         }
         if tracking_id:
