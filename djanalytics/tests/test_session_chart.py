@@ -32,7 +32,7 @@ class TestSessionChart(TestCase):
             created = datetime.datetime.now() - datetime.timedelta(days=3)
         )
         response = self.client.get(
-            reverse('dja_session_chart', urlconf='djanalytics.charts.urls'),
+            reverse('session_chart', urlconf='djanalytics.charts.urls'),
             data = {
                 'start_date': (
                     datetime.datetime.now() - datetime.timedelta(days=5)
