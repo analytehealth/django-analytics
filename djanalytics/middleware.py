@@ -32,7 +32,7 @@ class AnalyticsMiddleware(object):
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.path,
             'query_string': request.META.get('QUERY_STRING'),
-            'referrer': request.META.get('HTTP_REFERER', '')[:500],
+            'referrer': request.META.get('HTTP_REFERER', '')[:2083],
             'method': request.method,
             'domain': request.META.get('HTTP_HOST', ''),
             'response_code': response.status_code

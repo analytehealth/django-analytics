@@ -65,6 +65,7 @@ Change Log
 - 0.9
   - Fixed issue #6 - Referrer length > 200 characters causes 500 error
   - Added chart for top pages (issue #8)
+  - Now capturing domain in middleware
 
 - 0.8
   - Corrected name of user chart.
