@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'RequestEvent.referrer'
-        db.alter_column(u'djanalytics_requestevent', 'referrer', self.gf('django.db.models.fields.URLField')(max_length=500, null=True))
+        db.alter_column(u'djanalytics_requestevent', 'referrer', self.gf('django.db.models.fields.URLField')(max_length=2083, null=True))
 
     def backwards(self, orm):
 
