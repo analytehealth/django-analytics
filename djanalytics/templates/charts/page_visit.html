@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+    div.page_data {
+        border-style: solid;
+        border-width: 1px;
+        display: inline-block;
+        max-width: 32%;
+        vertical-align: top;
+    }
+</style>
+<title>Page Visits</title>
+</head>
+<body>
+<form id="page_visit_form">
+{% include 'charts/date_range_include.html' %}
+<input type="hidden" name="start_page" id="id_start_page" value="{{ start_page }}">
+<input type="submit">
+</form>
+<div class="page_data parents">
+{% for referrer, visits in page_info.parent_pages.items %}
+{{ referrer }} - {{ visits }}<br/>
+{% endfor %}
+</div>
+<div class="page_data target_page">
+{{ page_info.target_page.path }} - {{ page_info.target_page.visits }}<br/>
+</div>
+<div class="page_data children">
+{% for child in page_info.child_pages %}
+<a class="child_page" path="{{ child.path }}" href="#{{ child.path }}">{{ child.path }}</a> - {{ child.visits }}<br/>
+{% endfor %}
+</div>
+</body>
+<script type="text/javascript">
+window.jQuery || document.write('<script src="http://code.jquery.com/jquery-1.11.1.min.js"><\/script>');
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.child_page').click(function(e) {
+        $('#id_start_page').val(e.currentTarget.attributes.path.value);
+        $('#page_visit_form').submit();
+    });
+});
+</script>
+</html>

@@ -1,0 +1,52 @@
+from django.core.urlresolvers import reverse
+from django.test.testcases import TestCase
+
+from djanalytics import models
+
+
+class TestPageVisit(TestCase):
+
+    urls = 'djanalytics.charts.urls'
+
+    def setUp(self):
+        super(TestPageVisit, self).setUp()
+        self.dja_client = models.Client.objects.create(
+            name='testclient'
+        )
+        models.Domain.objects.create(
+            pattern='djanalytics.example.com',
+            client=self.dja_client
+        )
+
+    def test_page_visit(self):
+        for i in range(10):
+            models.RequestEvent.objects.create(
+                client=self.dja_client,
+                ip_address='192.168.1.%s' % i,
+                path='/home/',
+                referrer='http://djanalytics.example.com/referrer/' if i % 2 == 0 else '',
+            )
+        for i in range(10):
+            models.RequestEvent.objects.create(
+                client=self.dja_client,
+                ip_address='192.168.1.%s' % i,
+                path='/path1/' if i % 2 == 0 else '/path2/',
+                referrer='http://djanalytics.example.com/home/'
+            )
+        response = self.client.get(
+            reverse('page_visit', urlconf='djanalytics.charts.urls'),
+            data = {
+                'client_id': self.dja_client.uuid,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        page_info = response.context['page_info']
+        self.assertEqual(10, page_info['target_page']['visits'])
+        self.assertEqual(5, page_info['parent_pages'][''])
+        self.assertEqual(5, page_info['parent_pages']['http://djanalytics.example.com/referrer/'])
+        children = dict(
+            (page['path'], page['visits'])
+            for page in page_info['child_pages']
+        )
+        self.assertEqual(5, children['/path1/'])
+        self.assertEqual(5, children['/path2/'])
