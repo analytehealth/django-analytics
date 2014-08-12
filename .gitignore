@@ -4,3 +4,4 @@ venv
 dist
 build
 **/*pyc
+dj_analytics.egg-info
