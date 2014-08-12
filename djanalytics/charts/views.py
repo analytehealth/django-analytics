@@ -44,7 +44,7 @@ class DateRangeChartView(TemplateView):
         )
         self.end_date = datetime(
             end_date.year, end_date.month,
-            end_date.day, 0, 0, 0
+            end_date.day, 23, 59
         )
         context_data.update({
             'start_date': self.start_date.strftime('%m/%d/%Y'),
