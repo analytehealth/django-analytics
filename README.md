@@ -14,18 +14,22 @@ Add to django configuration
 * Add `djanalytics` to `INSTALLED_APPS` in settings.py file.
 * Run `manage.py migrate djanalytics` to create database tables.
 * Create and configure at least one Client and Domain.
-* In urls.py, include djanalytics urls. For example:
+* If you're capturing using HTML, in your urls.py, include djanalytics urls. For example:
 
     urlpatterns += patterns(
         '',
         (r'', include('djanalytics.urls'))
     )
+* For charts, include the charts urls:
 
-Use middleware
+    urlpatterns += patterns('', (r'^analytics/', include='djanalytics.charts.urls'))
+
+Capture using middleware
 --------------
 
-In settings.py, add 'djanalytics.middleware.AnalyticsMiddleware' to the MIDDLEWARE_CLASSES setting
+* In settings.py, add 'djanalytics.middleware.AnalyticsMiddleware' to the MIDDLEWARE_CLASSES setting
 for your django project.
+* In settings.py, add DJA_CLIENT_ID='[uuid of Client created above]'
 
 Capture using HTML
 ------------------
@@ -37,6 +41,20 @@ Capture using HTML
         '&rf=' + escape(document.referrer) +
         '" style="position:absolute; left: -999px"></img>";
     document.write(img_html);
+
+Filtering IP addresses
+----------------------
+
+If you're using the django admin app, djanalytics will automatically register its models. To filter
+by IP address, add a new IPFilter for your client. The IPFilter uses netmasks to filter addresses. You
+can also specify whether to include or exclude the given netmask. If you choose include, only IP
+addresses that match the netmask will be allowed in.
+
+Filtering Paths
+---------------
+
+The PathFilter model allows you to include or exclude path patterns. PathFilters use regex to determine
+a match on the path.
 
 License
 -------
