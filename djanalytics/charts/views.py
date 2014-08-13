@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from urlparse import urlparse
 
+from django.conf import settings
 from django.db.models import Count, Min
 from django.http.response import HttpResponseBadRequest
 from django.utils.datastructures import SortedDict
@@ -12,6 +13,13 @@ from graphos.renderers import gchart
 from graphos.sources.simple import SimpleDataSource
 
 from djanalytics import models
+from django.utils import timezone
+from django.utils.timezone import UTC
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 
 class DateRangeChartView(TemplateView):
@@ -31,13 +39,13 @@ class DateRangeChartView(TemplateView):
                 self.request.GET.get('start_date')
             )
         else:
-            start_date = datetime.now() - timedelta(days=7)
+            start_date = timezone.now() - timedelta(days=7)
         if self.request.GET.get('end_date'):
             end_date = parser.parse(
                 self.request.GET.get('end_date', datetime.now())
             )
         else:
-            end_date = datetime.now()
+            end_date = timezone.now()
         self.start_date = datetime(
             start_date.year, start_date.month,
             start_date.day, 0, 0, 0
@@ -46,6 +54,15 @@ class DateRangeChartView(TemplateView):
             end_date.year, end_date.month,
             end_date.day, 23, 59
         )
+        if settings.USE_TZ:
+            if pytz:
+                tz = pytz.timezone(settings.TIME_ZONE)
+            else:
+                tz = UTC()
+            if not timezone.is_aware(self.start_date):
+                self.start_date = tz.localize(self.start_date)
+            if not timezone.is_aware(self.end_date):
+                self.end_date = tz.localize(self.end_date)
         context_data.update({
             'start_date': self.start_date.strftime('%m/%d/%Y'),
             'end_date': self.end_date.strftime('%m/%d/%Y'),
@@ -61,14 +78,13 @@ class SessionChart(DateRangeChartView):
         context_data = super(SessionChart, self).get_context_data(**kwargs)
         data = [ ('Date', 'Sessions Created') ]
         date_dict = defaultdict(int)
-        for row in models.RequestEvent.objects.with_created_date().filter(
-            created__gte=self.start_date,
-            created__lte=self.end_date,
+        for row in models.RequestEvent.objects.values(
+            'tracking_key'
+        ).annotate(new_date=Min('created')).filter(
+            new_date__range=[self.start_date, self.end_date],
             client=self.client
-        ).values('created_date').annotate(
-            Count('tracking_key', distinct=True)
-        ).order_by():
-            date_dict[row['created_date']] = row['tracking_key__count']
+        ):
+            date_dict[row['new_date'].strftime('%Y-%m-%d')] += 1
         d = self.start_date
         while d <= self.end_date:
             data.append( (d.strftime('%Y-%m-%d'), date_dict[d.strftime('%Y-%m-%d')]) ) 
@@ -97,8 +113,7 @@ class UserChart(DateRangeChartView):
         for row in models.RequestEvent.objects.values(
             'tracking_user_id'
         ).annotate(new_date=Min('created')).filter(
-            new_date__gte=self.start_date,
-            new_date__lte=self.end_date,
+            new_date__range=[self.start_date, self.end_date],
             client=self.client
         ):
             date_dict[row['new_date'].strftime('%Y-%m-%d')] += 1
@@ -126,6 +141,7 @@ class PageVisit(DateRangeChartView):
     def get_context_data(self, **kwargs):
         context_data = super(PageVisit, self).get_context_data(**kwargs)
         query = models.RequestEvent.objects.filter(
+            client=self.client,
             created__range=[self.start_date, self.end_date]
         )
         if self.start_page:
@@ -168,3 +184,35 @@ class PageVisit(DateRangeChartView):
         return context_data
 
 page_visit = PageVisit.as_view()
+
+
+class ExitPage(DateRangeChartView):
+    template_name = 'charts/exit_page.html'
+
+    def get_context_data(self, **kwargs):
+        context_data = super(ExitPage, self).get_context_data(**kwargs)
+        exit_page_data = defaultdict(int)
+        sessions_query = models.RequestEvent.objects.values(
+            'tracking_key'
+        ).annotate(new_date=Min('created')).filter(
+            new_date__range=[self.start_date, self.end_date],
+            client=self.client
+        )
+        sessions = list(data['tracking_key'] for data in sessions_query)
+        for exit_page_row in models.RequestEvent.objects.filter(
+            tracking_key__in=sessions
+        ).values('path', 'tracking_key').order_by(
+            'tracking_key', '-created'
+        ):
+            if exit_page_row['tracking_key'] in sessions:
+                exit_page_data[exit_page_row['path']] += 1
+                sessions.pop(sessions.index(exit_page_row['tracking_key']))
+        exit_page_data = SortedDict(
+            sorted(exit_page_data.items(), key=lambda x: x[1], reverse=True)
+        )
+        context_data.update({
+            'exit_page_data': exit_page_data
+        })
+        return context_data
+
+exit_page = ExitPage.as_view()

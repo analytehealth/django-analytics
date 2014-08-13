@@ -8,7 +8,9 @@ class JsonHttpResponse(HttpResponse):
     "application/json".
 
     """
-    def __init__(self, content='', mimetype='application/json', status=None,
-                 content_type=None):
+    def __init__(self, content='', content_type='application/json', status=None):
         super(JsonHttpResponse, self).__init__(
-            jsonencoder.encode(content), mimetype, status, content_type)
+            jsonencoder.encode(content),
+            content_type=content_type,
+            status=status
+        )
