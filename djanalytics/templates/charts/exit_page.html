@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Exit Pages</title>
+</head>
+<body>
+<form id="page_visit_form">
+{% include 'charts/date_range_include.html' %}
+<input type="hidden" name="start_page" id="id_start_page" value="{{ start_page }}">
+<input type="submit">
+</form>
+<div class="exit_page_data">
+{% for exit_page, count in exit_page_data.items %}
+{{ exit_page }} - {{ count }}<br/>
+{% endfor %}
+</div>
+</body>
+</html>

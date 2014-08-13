@@ -78,7 +78,7 @@ class CaptureEventView(View):
         if not tracking_id:
             request.session['dja_tracking_id'] = new_event.tracking_key
         img_data = file(os.path.join(TRACKING_PIXEL_PATH, 'tracking_pixel.png')).read()
-        response = HttpResponse(content=img_data, status=status, mimetype='image/png')
+        response = HttpResponse(content=img_data, status=status, content_type='image/png')
         response.set_cookie('dja_uuid', new_event.tracking_user_id,
                             expires=datetime.now() + timedelta(days=365))
         return response
