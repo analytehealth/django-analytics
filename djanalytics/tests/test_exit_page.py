@@ -1,23 +1,12 @@
 import datetime
 
 from django.core.urlresolvers import reverse
-from django.test.testcases import TestCase
+from django.utils import timezone
 
 from djanalytics import models
+from djanalytics.tests.base_chart_test import BaseChartTest
 
-class TestExitPage(TestCase):
-
-    urls = 'djanalytics.charts.urls'
-
-    def setUp(self):
-        super(TestExitPage, self).setUp()
-        self.dja_client = models.Client.objects.create(
-            name='testclient'
-        )
-        models.Domain.objects.create(
-            pattern='djanalytics.example.com',
-            client=self.dja_client
-        )
+class TestExitPage(BaseChartTest):
 
     def test_exit_page(self):
         for i in range(3):
@@ -61,7 +50,7 @@ class TestExitPage(TestCase):
                 path='/',
                 ip_address='192.168.1.%s' % i,
         )
-        first_page.created = datetime.datetime.now() - datetime.timedelta(days=14)
+        first_page.created = timezone.now() - datetime.timedelta(days=14)
         first_page.save()
         models.RequestEvent.objects.create(
             client=self.dja_client,
@@ -69,7 +58,6 @@ class TestExitPage(TestCase):
             ip_address=first_page.ip_address,
             tracking_key=first_page.tracking_key,
             tracking_user_id=first_page.tracking_user_id,
-            created=datetime.datetime.now()
         )
         response = self.client.get(
             reverse('exit_page', urlconf='djanalytics.charts.urls'),
