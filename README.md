@@ -69,7 +69,7 @@ Change Log
   - Added chart for exit pages (issue #9)
   - Added chart for external referrers (issue #7)
   - Made base template for charts to better allow for overrides
-  _ Broke chart views.py file up into individual modules
+  - Broke chart views.py file up into individual modules
 
 - 0.8
   - Corrected name of user chart.
