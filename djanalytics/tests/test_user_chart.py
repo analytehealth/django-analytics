@@ -1,15 +1,15 @@
 import datetime
 
-from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from djanalytics import models
 from djanalytics.tests.base_chart_test import BaseChartTest
+from django.core.urlresolvers import reverse
 
 
-class TestSessionChart(BaseChartTest):
+class TestUserChart(BaseChartTest):
 
-    def test_get(self):
+    def test_user_chart(self):
         created_date = timezone.now() - datetime.timedelta(days=3)
         for i in range(3):
             re = models.RequestEvent.objects.create(
@@ -26,7 +26,7 @@ class TestSessionChart(BaseChartTest):
             models.RequestEvent.objects.create(
                 client=re.client,
                 ip_address=re.ip_address,
-                tracking_key=re.tracking_key
+                tracking_user_id=re.tracking_user_id
             )
         re = models.RequestEvent.objects.create(
             ip_address = '1.1.1.1',
@@ -43,10 +43,10 @@ class TestSessionChart(BaseChartTest):
         models.RequestEvent.objects.create(
             client=re.client,
             ip_address=re.ip_address,
-            tracking_key=re.tracking_key
+            tracking_user_id=re.tracking_user_id
         )
         response = self.client.get(
-            reverse('session_chart', urlconf='djanalytics.charts.urls'),
+            reverse('user_chart', urlconf='djanalytics.charts.urls'),
             data = {
                 'start_date': (
                     datetime.datetime.now() - datetime.timedelta(days=5)

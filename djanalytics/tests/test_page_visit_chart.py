@@ -1,22 +1,10 @@
 from django.core.urlresolvers import reverse
-from django.test.testcases import TestCase
 
 from djanalytics import models
+from djanalytics.tests.base_chart_test import BaseChartTest
 
 
-class TestPageVisit(TestCase):
-
-    urls = 'djanalytics.charts.urls'
-
-    def setUp(self):
-        super(TestPageVisit, self).setUp()
-        self.dja_client = models.Client.objects.create(
-            name='testclient'
-        )
-        models.Domain.objects.create(
-            pattern='djanalytics.example.com',
-            client=self.dja_client
-        )
+class TestPageVisit(BaseChartTest):
 
     def test_page_visit(self):
         for i in range(10):

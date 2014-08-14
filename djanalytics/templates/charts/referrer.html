@@ -1,0 +1,13 @@
+{% extends 'charts/daterange_chart_template.html' %}
+
+{% block title %}
+<title>Referrers</title>
+{% endblock %}
+
+{% block page_data %}
+    <div class="referrer_data">
+    {% for referrer, count in referrer_data.items %}
+        {{ referrer }} - {{ count }}<br/>
+    {% endfor %}
+    </div>
+{% endblock %}
