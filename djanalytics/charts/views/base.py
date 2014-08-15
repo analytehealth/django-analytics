@@ -33,7 +33,7 @@ class DateRangeChartView(TemplateView):
             start_date = timezone.now() - timedelta(days=7)
         if self.request.GET.get('end_date'):
             end_date = parser.parse(
-                self.request.GET.get('end_date', datetime.now())
+                self.request.GET.get('end_date')
             )
         else:
             end_date = timezone.now()
