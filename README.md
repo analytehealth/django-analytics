@@ -39,6 +39,8 @@ Capture using HTML
         '&pth=' + escape(window.location.pathname) +
         '&qs=' + escape(window.location.search.substr(window.location.search.indexOf('?')+1)) +
         '&rf=' + escape(document.referrer) +
+        '&sw=' + screen.width +
+        '&sh=' + screen.height +
         '" style="position:absolute; left: -999px"></img>";
     document.write(img_html);
 
@@ -62,6 +64,10 @@ License
 
 Change Log
 ----------
+- 0.10
+  - Added screen width and height to RequestEvent model (issue #10)
+  - Added 'sw' and 'sh' parameters to Capture view to support screen width and height
+
 - 0.9
   - Fixed issue #6 - Referrer length > 200 characters causes 500 error
   - Added chart for top pages (issue #8)

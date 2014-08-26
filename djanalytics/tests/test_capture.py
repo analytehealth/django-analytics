@@ -30,7 +30,9 @@ class TestCapture(TestCase):
             data={
                 'dja_id': self.dja_client.uuid,
                 'qs': 'query_key=query_value&another_query_key=another_query_value',
-                'pth': '/'
+                'pth': '/',
+                'sw': '800',
+                'sh': '600'
             }
         )
         self.assertEqual(201, response.status_code)
@@ -46,6 +48,8 @@ class TestCapture(TestCase):
         self.assertEqual(event.path, '/')
         self.assertEqual(event.domain, 'djanalytics_too.example.com:81')
         self.assertEqual(event.protocol, 'http')
+        self.assertEqual(event.screen_width, 800)
+        self.assertEqual(event.screen_height, 600)
 
         # second request should have same tracking_id and tracking_user_id
         response = self.client.get(

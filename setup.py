@@ -1,7 +1,7 @@
 from distutils.core import setup
 from setuptools import find_packages
 
-version = '0.9'
+version = '0.10'
 
 setup(
     name='dj-analytics',

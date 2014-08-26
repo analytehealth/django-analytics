@@ -66,6 +66,8 @@ class CaptureEventView(View):
             'path': request.GET.get('pth', ''),
             'query_string': request.GET.get('qs', ''),
             'referrer': request.GET.get('rf', '')[:2083],
+            'screen_width': request.GET.get('sw'),
+            'screen_height': request.GET.get('sh'),
         }
         status = 201 # CREATED
         if tracking_id:

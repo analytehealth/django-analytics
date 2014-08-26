@@ -93,6 +93,8 @@ class RequestEvent(models.Model):
     referrer = models.URLField(blank=True, null=True, db_index=True, max_length=2083)
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     response_code = models.IntegerField(null=True, blank=True, db_index=True)
+    screen_width = models.PositiveSmallIntegerField(null=True, blank=True)
+    screen_height = models.PositiveSmallIntegerField(null=True, blank=True)
     client = models.ForeignKey(Client)
     location = models.ForeignKey(Location, null=True, blank=True)
 
