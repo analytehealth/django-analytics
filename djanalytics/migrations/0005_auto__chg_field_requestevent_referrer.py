@@ -3,6 +3,7 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from django.db.utils import OperationalError
 
 
 class Migration(SchemaMigration):
@@ -10,7 +11,11 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'RequestEvent.referrer'
-        db.delete_index(u'djanalytics_requestevent', ['referrer'])
+        try:
+            db.delete_index(u'djanalytics_requestevent', ['referrer'])
+        except OperationalError:
+            # index might not exist - not the end of the world
+            pass
         db.alter_column(u'djanalytics_requestevent', 'referrer', self.gf('django.db.models.fields.URLField')(max_length=2083, null=True))
 
     def backwards(self, orm):
