@@ -64,6 +64,9 @@ License
 
 Change Log
 ----------
+- 0.10.1
+  - Fix for issue #11 - Max key length exceeded with referrer field
+
 - 0.10
   - Added screen width and height to RequestEvent model (issue #10)
   - Added 'sw' and 'sh' parameters to Capture view to support screen width and height

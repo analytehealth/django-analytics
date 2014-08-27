@@ -74,7 +74,7 @@ class Migration(SchemaMigration):
             'path': ('django.db.models.fields.URLField', [], {'db_index': 'True', 'max_length': '200', 'blank': 'True'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'query_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'referrer': ('django.db.models.fields.URLField', [], {'db_index': 'True', 'max_length': '2083', 'null': 'True', 'blank': 'True'}),
+            'referrer': ('django.db.models.fields.URLField', [], {'max_length': '2083', 'null': 'True', 'blank': 'True'}),
             'response_code': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'screen_height': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),
             'screen_width': ('django.db.models.fields.PositiveSmallIntegerField', [], {'null': 'True', 'blank': 'True'}),

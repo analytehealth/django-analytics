@@ -10,12 +10,14 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
 
         # Changing field 'RequestEvent.referrer'
+        db.delete_index(u'djanalytics_requestevent', ['referrer'])
         db.alter_column(u'djanalytics_requestevent', 'referrer', self.gf('django.db.models.fields.URLField')(max_length=2083, null=True))
 
     def backwards(self, orm):
 
         # Changing field 'RequestEvent.referrer'
         db.alter_column(u'djanalytics_requestevent', 'referrer', self.gf('django.db.models.fields.URLField')(max_length=200, null=True))
+        db.create_index(u'djanalytics_requestevent', ['referrer'])
 
     models = {
         'djanalytics.client': {
@@ -64,7 +66,7 @@ class Migration(SchemaMigration):
             'path': ('django.db.models.fields.URLField', [], {'db_index': 'True', 'max_length': '200', 'blank': 'True'}),
             'protocol': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'query_string': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'referrer': ('django.db.models.fields.URLField', [], {'db_index': 'True', 'max_length': '2083', 'null': 'True', 'blank': 'True'}),
+            'referrer': ('django.db.models.fields.URLField', [], {'max_length': '2083', 'null': 'True', 'blank': 'True'}),
             'response_code': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'tracking_key': ('django.db.models.fields.CharField', [], {'default': "'b08a999f-d1fe-48ba-9b4a-f8c44298e8c1'", 'max_length': '36'}),
             'tracking_user_id': ('django.db.models.fields.CharField', [], {'default': "'04457bac-4357-42f2-ae8f-2762e60892e0'", 'max_length': '36'}),
