@@ -4,40 +4,43 @@ import re
 from datetime import datetime, timedelta
 from urlparse import urlparse
 
+from django.conf import settings
+from django.core.urlresolvers import reverse_lazy
 from django.http.response import (
     HttpResponseForbidden,
     HttpResponseBadRequest,
     HttpResponse
 )
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
+
+import jsmin
 
 from . import models
-from django.conf import settings
+from django.template.response import TemplateResponse
 
 TRACKING_PIXEL_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
-class CaptureEventView(View):
+class ValidatedViewMixin(object):
 
-    def get(self, request):
-        tracking_id = request.session.get('dja_tracking_id')
-        user_id = request.COOKIES.get('dja_uuid')
-        parsed_url = urlparse(request.META.get('HTTP_REFERER', ''))
-        origin = parsed_url.hostname or ''
-        try:
-            client_id = request.GET.get('dja_id')
-        except KeyError:
-            return HttpResponseBadRequest(content='dja_id not passed')
+    parsed_url = None
+    client = None
+    client_ip = None
+
+    def is_valid(self, request):
+        self.parsed_url = urlparse(request.META.get('HTTP_REFERER', ''))
+        origin = self.parsed_url.hostname or ''
+        client_id = request.GET.get('dja_id')
 
         try:
-            client = models.Client.objects.get(uuid=client_id)
+            self.client = models.Client.objects.get(uuid=client_id)
         except models.Client.DoesNotExist:
             return HttpResponseForbidden(content='Client not found')
 
-        if not client.domain_set.exists():
+        if not self.client.domain_set.exists():
             return HttpResponseBadRequest(content='No domains found for client')
 
         domain_found = False
-        for domain in client.domain_set.all():
+        for domain in self.client.domain_set.all():
             if re.match('.*%s$' % domain.pattern, origin, re.IGNORECASE):
                 domain_found = True
                 break
@@ -45,23 +48,38 @@ class CaptureEventView(View):
             return HttpResponseForbidden(content='Invalid domain for client')
 
         if settings.USE_X_FORWARDED_HOST:
-            client_ip = request.META.get(
+            self.client_ip = request.META.get(
                 'HTTP_X_FORWARDED_FOR',
                 request.META.get('REMOTE_ADDR', '')
             )
         else:
-            client_ip = request.META.get('REMOTE_ADDR')
+            self.client_ip = request.META.get('REMOTE_ADDR')
 
-        if not client.path_valid(
+
+class CaptureEventView(View, ValidatedViewMixin):
+
+    def get(self, request):
+        invalid_response = self.is_valid(request)
+
+        if invalid_response:
+            return invalid_response
+
+        if not self.client.path_valid(
             request.GET.get('pth', '')
-        ) or not client.ip_valid(client_ip):
+        ) or not self.client.ip_valid(self.client_ip):
             return HttpResponse(status=204) # NO_CONTENT
 
+        tracking_id = request.GET.get(
+            'dti', request.session.get('dja_tracking_id')
+        )
+        user_id = request.GET.get(
+            'dja_uuid', request.COOKIES.get('dja_uuid')
+        )
         data = {
-            'domain': parsed_url.netloc,
-            'protocol': parsed_url.scheme,
-            'client': client,
-            'ip_address': client_ip,
+            'domain': self.parsed_url.netloc,
+            'protocol': self.parsed_url.scheme,
+            'client': self.client,
+            'ip_address': self.client_ip,
             'user_agent': request.META.get('HTTP_USER_AGENT', 'None'),
             'path': request.GET.get('pth', ''),
             'query_string': request.GET.get('qs', ''),
@@ -86,3 +104,52 @@ class CaptureEventView(View):
         return response
 
 capture_event = CaptureEventView.as_view()
+
+
+class MinifiedJsTemplateResponse(TemplateResponse):
+
+    @property
+    def rendered_content(self):
+        """Returns a 'minified' version of the javascript content"""
+        content = super(MinifiedJsTemplateResponse, self).rendered_content
+        content = jsmin.jsmin(content)
+        return content
+
+
+class DjanalyticsJs(TemplateView, ValidatedViewMixin):
+
+    template_name = 'djanalytics.js'
+    response_class = MinifiedJsTemplateResponse
+    content_type = 'application/javascript'
+
+    def get(self, request, *args, **kwargs):
+        invalid_response = self.is_valid(request)
+
+        if invalid_response:
+            return invalid_response
+
+        if not self.client.ip_valid(self.client_ip):
+            return HttpResponse(content='', content_type=self.content_type)
+        return super(DjanalyticsJs, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context_data = super(DjanalyticsJs, self).get_context_data(**kwargs)
+        tl_domain = '.'.join(self.parsed_url.netloc.split('.')[-2:])
+        # the js will check for existing cookie values for uuid and tracking_id
+        # and will only use the generated values below if cookie values
+        # don't exist
+        context_data.update(
+            {
+                'uuid': models.generate_uuid(),
+                'tracking_id': models.generate_uuid(), 
+                'domain': '.%s' % tl_domain,
+                'dja_id': self.client.uuid,
+                'capture_img_url': '%s%s' % (
+                    self.request.META.get('HTTP_HOST', ''),
+                    reverse_lazy('dja_capture')
+                ),
+            }
+        )
+        return context_data
+
+djanalytics_js = DjanalyticsJs.as_view()

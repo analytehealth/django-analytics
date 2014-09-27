@@ -7,3 +7,4 @@ ipaddress
 python-dateutil
 django-graphos==0.0.2a0
 pytz
+jsmin>=2.0.6

@@ -20,6 +20,10 @@ class TestMiddleware(TestCase):
             name='test',
             uuid='test'
         )
+        models.Domain.objects.create(
+            pattern='.*',
+            client=self.dja_client
+        )
 
     def tearDown(self):
         settings.MIDDLEWARE_CLASSES = self.orig_middleware
@@ -99,3 +103,65 @@ class TestMiddleware(TestCase):
         )
         self.assertEqual(event.response_code, 404)
         self.assertEqual(event.referrer, '/')
+
+    def test_cross_domain_middleware_get(self):
+        settings.MIDDLEWARE_CLASSES = self.orig_middleware + (
+            'djanalytics.middleware.CrossDomainMiddleware',
+        )
+        uuid = models.generate_uuid()
+        tracking_id = models.generate_uuid()
+        self.client.get(
+            '/', 
+            data={
+                'dja_uuid': uuid,
+                'dja_tracking_id': tracking_id,
+                'dja_id': self.dja_client.uuid,
+            }
+        )
+        uuid_cookie = self.client.cookies.pop('dja_uuid')
+        self.assertEqual(uuid_cookie.value, uuid)
+
+        tracking_id_cookie = self.client.cookies.pop('dti')
+        self.assertEqual(tracking_id_cookie.value, tracking_id)
+
+    def test_cross_domain_middleware_post(self):
+        settings.MIDDLEWARE_CLASSES = self.orig_middleware + (
+            'djanalytics.middleware.CrossDomainMiddleware',
+        )
+        uuid = models.generate_uuid()
+        tracking_id = models.generate_uuid()
+        self.client.post(
+            '/', 
+            data={
+                'dja_uuid': uuid,
+                'dja_tracking_id': tracking_id,
+                'dja_id': self.dja_client.uuid,
+            }
+        )
+        uuid_cookie = self.client.cookies.pop('dja_uuid')
+        self.assertEqual(uuid_cookie.value, uuid)
+
+        tracking_id_cookie = self.client.cookies.pop('dti')
+        self.assertEqual(tracking_id_cookie.value, tracking_id)
+
+    def test_cross_domain_middleware_bad_domain(self):
+        settings.MIDDLEWARE_CLASSES = self.orig_middleware + (
+            'djanalytics.middleware.CrossDomainMiddleware',
+        )
+        models.Domain.objects.update(pattern='ex.com')
+        uuid = models.generate_uuid()
+        tracking_id = models.generate_uuid()
+        self.client.post(
+            '/', 
+            data={
+                'dja_uuid': uuid,
+                'dja_tracking_id': tracking_id,
+                'dja_id': self.dja_client.uuid,
+            },
+            HTTP_REFERRER='example.com'
+        )
+        with self.assertRaises(KeyError):
+            self.client.cookies.pop('dja_uuid')
+        
+        with self.assertRaises(KeyError):
+            self.client.cookies.pop('dti')
