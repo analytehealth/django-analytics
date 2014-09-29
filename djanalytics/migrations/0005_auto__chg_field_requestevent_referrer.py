@@ -3,7 +3,11 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.db.utils import OperationalError
+# django 1.5 compatibility
+try:
+    from django.db.utils import OperationalError
+except:
+    OperationalError = Exception
 
 
 class Migration(SchemaMigration):
