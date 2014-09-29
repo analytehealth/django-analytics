@@ -34,6 +34,7 @@ for your django project.
 Capture using HTML
 ------------------
 
+    <script>
     var img_html = '<img src="http://dja_server.example.com/capture/' +
         '?dja_id=[client uuid]' +
         '&pth=' + escape(window.location.pathname) +
@@ -42,7 +43,30 @@ Capture using HTML
         '&sw=' + screen.width +
         '&sh=' + screen.height +
         '" style="position:absolute; left: -999px"></img>";
-    document.write(img_html);
+    document.getElementsByTagName('body')[0].innerHTML += img_html;
+    </script>
+
+Capture Cross-Domain
+--------------------
+If you're hosting your djanalytics instance in a different domain than the site you're capturing,
+you will need to use a slightly different mechanism. Set up djanalytics on your server, and ensure
+it's got a url for the djanalytics_js view (included in the urls.py file). Then put the following
+javascript in your templates:
+
+    <script>
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://dja_server.example.com/djanalytics.js' +
+                 '?dja_id=[client uuid]';
+    document.getElementsByTagName('body')[0].appendChild(script);
+    </script>
+
+If you want to maintain tracking ids across domains, you'll need to add them to links between sites.
+If the site you're linking to is a django site with djanalytics installed, you can use the
+cross-domain middleware by adding 'djanalytics.middleware.CrossDomainMiddleware' to your
+MIDDLEWARE_CLASSES setting and then pass the client ID, user ID and tracking ID (dja_id, dja_uuid,
+and dja_tracking_id respectively) in your link as parameters. This will then handle setting the
+appropriate cookies.
 
 Filtering IP addresses
 ----------------------
@@ -64,6 +88,9 @@ License
 
 Change Log
 ----------
+- 0.11
+  - Added issue #13 - Cross-domain capabilities
+
 - 0.10.1
   - Fix for issue #11 - Max key length exceeded with referrer field
 
