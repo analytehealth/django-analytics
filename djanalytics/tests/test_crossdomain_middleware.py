@@ -10,10 +10,10 @@ from djanalytics import models
         'djanalytics.middleware.CrossDomainMiddleware',
     )
 )
-class TestMiddleware(TestCase):
+class TestCrossDomainMiddleware(TestCase):
 
     def setUp(self):
-        super(TestMiddleware, self).setUp()
+        super(TestCrossDomainMiddleware, self).setUp()
         self.dja_client = models.Client.objects.create(
             name='test',
             uuid='test'

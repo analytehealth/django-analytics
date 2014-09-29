@@ -14,10 +14,10 @@ from djanalytics import models
             'djanalytics.middleware.AnalyticsMiddleware',
     )
 )
-class TestMiddleware(TestCase):
+class TestAnalyticsMiddleware(TestCase):
 
     def setUp(self):
-        super(TestMiddleware, self).setUp()
+        super(TestAnalyticsMiddleware, self).setUp()
         self.dja_client = models.Client.objects.create(
             name='test',
             uuid='test'
