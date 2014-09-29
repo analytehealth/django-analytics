@@ -1,8 +1,9 @@
+import re
+
 from django.test.testcases import TestCase
 
 from djanalytics import models
 from django.core.urlresolvers import reverse
-import re
 
 class TestDjanalyticsJs(TestCase):
 

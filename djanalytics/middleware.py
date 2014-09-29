@@ -54,21 +54,10 @@ class AnalyticsMiddleware(object):
 class CrossDomainMiddleware(object):
 
     def process_response(self, request, response):
-        uuid = getattr(
-            request, 
-            request.META.get('REQUEST_METHOD', 'GET'),
-            {}
-        ).get('dja_uuid')
-        tracking_id = getattr(
-            request,
-            request.META.get('REQUEST_METHOD', 'GET'),
-            {}
-        ).get('dja_tracking_id')
-        client_id = getattr(
-            request,
-            request.META.get('REQUEST_METHOD', 'GET'),
-            {}
-        ).get('dja_id')
+        data = getattr(request, request.META.get('REQUEST_METHOD', 'GET'), {})
+        uuid = data.get('dja_uuid')
+        tracking_id = data.get('dja_tracking_id')
+        client_id = data.get('dja_id')
         try:
             self.client = models.Client.objects.get(uuid=client_id)
         except models.Client.DoesNotExist:

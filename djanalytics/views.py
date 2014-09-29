@@ -4,6 +4,8 @@ import re
 from datetime import datetime, timedelta
 from urlparse import urlparse
 
+import jsmin
+
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import (
@@ -11,12 +13,10 @@ from django.http.response import (
     HttpResponseBadRequest,
     HttpResponse
 )
+from django.template.response import TemplateResponse
 from django.views.generic.base import View, TemplateView
 
-import jsmin
-
 from . import models
-from django.template.response import TemplateResponse
 
 TRACKING_PIXEL_PATH = os.path.join(os.path.dirname(__file__), 'templates')
 
@@ -111,6 +111,10 @@ class MinifiedJsTemplateResponse(TemplateResponse):
     @property
     def rendered_content(self):
         """Returns a 'minified' version of the javascript content"""
+        template = self.resolve_template(self.template_name)
+        if template.name.endswith('.min'):
+            return super(MinifiedJsTemplateResponse, self).rendered_content
+        # if no minified template exists, minify the response
         content = super(MinifiedJsTemplateResponse, self).rendered_content
         content = jsmin.jsmin(content)
         return content
@@ -118,7 +122,6 @@ class MinifiedJsTemplateResponse(TemplateResponse):
 
 class DjanalyticsJs(TemplateView, ValidatedViewMixin):
 
-    template_name = 'djanalytics.js'
     response_class = MinifiedJsTemplateResponse
     content_type = 'application/javascript'
 
@@ -131,6 +134,9 @@ class DjanalyticsJs(TemplateView, ValidatedViewMixin):
         if not self.client.ip_valid(self.client_ip):
             return HttpResponse(content='', content_type=self.content_type)
         return super(DjanalyticsJs, self).get(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return ['djanalytics.js.min', 'djanalytics.js']
 
     def get_context_data(self, **kwargs):
         context_data = super(DjanalyticsJs, self).get_context_data(**kwargs)
