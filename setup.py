@@ -1,12 +1,12 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 try:
     from setuptools import setup, find_packages
 except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
     from setuptools import setup, find_packages
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from setuptools_utils import minify
 
 version = '0.11.dev'
