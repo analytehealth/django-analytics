@@ -24,6 +24,7 @@ setup(
     author='Analyte Health',
     author_email='tech@analytehealth.com',
     url='https://github.com/analytehealth/django-analytics',
+    zip_safe=False,
     download_url='https://github.com/analytehealth/django-analytics/archive/%s.tar.gz' % version,
     packages=find_packages(exclude=('*.tests',)),
     package_data={
