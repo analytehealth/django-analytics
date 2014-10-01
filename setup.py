@@ -1,20 +1,13 @@
-from distutils.core import setup
-from setuptools import find_packages
-
-# this is a hack until I figure out how to properly do this with setup
 try:
-    import jsmin
-
-    djanalytics_js_in = open('djanalytics/templates/djanalytics.js')
-    djanalytics_js_out = open('djanalytics/templates/djanalytics.js.min', 'w')
-    try:
-        jsmin.JavascriptMinify(djanalytics_js_in, djanalytics_js_out).minify()
-    finally:
-        djanalytics_js_in.close()
-        djanalytics_js_out.close()
-except:
-    pass
-#endhack
+    from setuptools import setup, find_packages
+except ImportError:
+    from ez_setup import use_setuptools
+    use_setuptools()
+    from setuptools import setup, find_packages
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from setuptools_utils import minify
 
 version = '0.11'
 
@@ -38,6 +31,11 @@ setup(
     description='Django app to capture, track and display site analytics',
     long_description=open('README.md').read(),
     install_requires=[
-        ln for ln in open('requirements.txt').read().split('\n')
+        'ipaddress',
+        'python-dateutil',
+        'django-graphos==0.0.2a0',
+        'pytz',
+        'jsmin>=2.0.6',
     ],
+    cmdclass={'build': minify},
 )
