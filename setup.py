@@ -6,7 +6,7 @@ try:
     import jsmin
 
     djanalytics_js_in = open('djanalytics/templates/djanalytics.js')
-    djanalytics_js_out = open('djanalytics/templates/djanalytics.js', 'w')
+    djanalytics_js_out = open('djanalytics/templates/djanalytics.js.min', 'w')
     try:
         jsmin.JavascriptMinify(djanalytics_js_in, djanalytics_js_out).minify()
     finally:
@@ -30,6 +30,8 @@ setup(
         'djanalytics': [
             'templates/charts/*',
             'templates/*png'
+            'templates/*js',
+            'templates/*min',
         ],
     },
     description='Django app to capture, track and display site analytics',
