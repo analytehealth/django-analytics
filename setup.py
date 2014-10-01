@@ -30,6 +30,9 @@ setup(
     },
     description='Django app to capture, track and display site analytics',
     long_description=open('README.md').read(),
+    setup_requires=[
+        'jsmin>=2.0.6',
+    ],
     install_requires=[
         'ipaddress',
         'python-dateutil',
