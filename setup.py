@@ -30,7 +30,7 @@ setup(
     package_data={
         'djanalytics': [
             'templates/charts/*',
-            'templates/*png'
+            'templates/*png',
             'templates/*js',
             'templates/*min',
         ],
