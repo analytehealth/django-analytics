@@ -1,17 +1,22 @@
 from distutils.core import setup
 from setuptools import find_packages
 
-import jsmin
-
-djanalytics_js_in = open('djanalytics/templates/djanalytics.js')
-djanalytics_js_out = open('djanalytics/templates/djanalytics.js', 'w')
+# this is a hack until I figure out how to properly do this with setup
 try:
-    jsmin.JavascriptMinify(djanalytics_js_in, djanalytics_js_out).minify()
-finally:
-    djanalytics_js_in.close()
-    djanalytics_js_out.close()
+    import jsmin
 
-version = '0.10.1'
+    djanalytics_js_in = open('djanalytics/templates/djanalytics.js')
+    djanalytics_js_out = open('djanalytics/templates/djanalytics.js', 'w')
+    try:
+        jsmin.JavascriptMinify(djanalytics_js_in, djanalytics_js_out).minify()
+    finally:
+        djanalytics_js_in.close()
+        djanalytics_js_out.close()
+except:
+    pass
+#endhack
+
+version = '0.11'
 
 setup(
     name='dj-analytics',
