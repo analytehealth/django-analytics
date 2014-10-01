@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from setuptools_utils import minify
 
-version = '0.11'
+version = '0.11.dev'
 
 setup(
     name='dj-analytics',
@@ -30,9 +30,6 @@ setup(
     },
     description='Django app to capture, track and display site analytics',
     long_description=open('README.md').read(),
-    setup_requires=[
-        'jsmin>=2.0.6',
-    ],
     install_requires=[
         'ipaddress',
         'python-dateutil',
@@ -40,5 +37,5 @@ setup(
         'pytz',
         'jsmin>=2.0.6',
     ],
-    cmdclass={'build': minify},
+    cmdclass={'minify': minify},
 )
