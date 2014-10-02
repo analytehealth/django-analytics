@@ -73,7 +73,7 @@ class CaptureEventView(View, ValidatedViewMixin):
             'dti', request.session.get('dja_tracking_id')
         )
         user_id = request.GET.get(
-            'dja_uuid', request.COOKIES.get('dja_uuid')
+            'du', request.COOKIES.get('dja_uuid')
         )
         data = {
             'domain': self.parsed_url.netloc,
