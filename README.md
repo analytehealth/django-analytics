@@ -20,6 +20,7 @@ Add to django configuration
         '',
         (r'', include('djanalytics.urls'))
     )
+
 * For charts, include the charts urls:
 
     urlpatterns += patterns('', (r'^analytics/', include='djanalytics.charts.urls'))
