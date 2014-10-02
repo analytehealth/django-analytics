@@ -118,7 +118,7 @@ class Domain(models.Model):
 
 class IPFilter(models.Model):
     netmask = models.CharField(max_length=19)
-    include = models.BooleanField()
+    include = models.BooleanField(default=False)
     client = models.ForeignKey(Client)
 
     def valid(self, ip_address):
@@ -136,7 +136,7 @@ class IPFilter(models.Model):
 
 class PathFilter(models.Model):
     path_pattern = models.CharField(max_length=200)
-    include = models.BooleanField()
+    include = models.BooleanField(default=False)
     client = models.ForeignKey(Client)
 
     def valid(self, path):
