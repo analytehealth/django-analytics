@@ -1,7 +1,9 @@
+from mock import patch
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+
 from djanalytics import models
-from mock import patch
 
 
 class TestCapture(TestCase):
@@ -103,6 +105,31 @@ class TestCapture(TestCase):
         )
         self.assertNotEqual(tracking_id, response.client.session['dja_tracking_id'],
             'New tracking id should be in session')
+
+    def test_capture_get_tracking_ids_in_query(self):
+        tracking_id = models.generate_uuid()
+        tracking_user_id = models.generate_uuid()
+        self.client.get(
+            reverse('dja_capture', urlconf='djanalytics.urls'),
+            HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
+                            'Gecko/20100101 Firefox/29.0',
+            HTTP_REFERER='http://djanalytics_too.example.com:81',
+            data={
+                'dja_id': self.dja_client.uuid,
+                'qs': 'query_key=query_value&another_query_key=another_query_value',
+                'pth': '/',
+                'sw': '800',
+                'sh': '600',
+                'dti': tracking_id,
+                'du': tracking_user_id
+            }
+        )
+        self.assertTrue(
+            models.RequestEvent.objects.filter(
+                tracking_key=tracking_id,
+                tracking_user_id=tracking_user_id
+            ).exists()
+        )
 
     def test_invalid_client_id(self):
         response = self.client.get(
