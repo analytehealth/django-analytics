@@ -42,7 +42,7 @@ var sed = new Date();
 sed.setTime(sed.getTime() + 30*60000);
 _sc("dti", dti, sed, "{{ domain }}");
 
-var img_html='<img src="https://{{ capture_img_url }}/' +
+var img_html='<img src="https://{{ capture_img_url }}' +
              '?dja_id={{ dja_id }}' +
              '&pth=' + window.location.pathname +
              '&qs=' + 
