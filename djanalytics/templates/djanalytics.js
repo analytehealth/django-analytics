@@ -42,13 +42,15 @@ var sed = new Date();
 sed.setTime(sed.getTime() + 30*60000);
 _sc("dti", dti, sed, "{{ domain }}");
 
-var img_html='<img src="https://{{ capture_img_url }}' +
+var img = document.createElement('img');
+img.src = 'https://{{ capture_img_url }}' +
              '?dja_id={{ dja_id }}' +
              '&pth=' + window.location.pathname +
-             '&qs=' + 
+             '&qs=' +
              _es(window.location.search.substr(window.location.search.indexOf('?')+1)) +
              '&rf='+_es(document.referrer) +
-             '&dti='+_es(dti)+'&du='+_es(du) +
-             '" style=\"position:absolute;left:-999px"></img>';
+             '&dti='+_es(dti)+'&du='+_es(du);
+img.style.position = 'absolute';
+img.style.left = '-999px';
 
-document.write(img_html);
+document.getElementById('dja_tag').appendChild(img);

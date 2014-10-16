@@ -89,6 +89,9 @@ License
 
 Change Log
 ----------
+- 0.11.2
+  - Fix for issue #16 - try to make sure all browsers work with djanalytics.js (IE8 had some issues)
+
 - 0.11.1
   - Fix for issue #15 - djanalytics.js is breaking events
 
