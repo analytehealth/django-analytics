@@ -89,6 +89,9 @@ License
 
 Change Log
 ----------
+- 0.11.1
+  - Fix for issue #15 - djanalytics.js is breaking events
+
 - 0.11
   - Added issue #13 - Cross-domain capabilities
 

@@ -9,7 +9,7 @@ except ImportError:
     from setuptools import setup, find_packages
 from setuptools_utils import minify
 
-version = '0.11'
+version = '0.11.1'
 
 setup(
     name='dj-analytics',

@@ -51,4 +51,4 @@ var img_html='<img src="https://{{ capture_img_url }}' +
              '&dti='+_es(dti)+'&du='+_es(du) +
              '" style=\"position:absolute;left:-999px"></img>';
 
-document.getElementsByTagName('body')[0].innerHTML += img_html;
+document.write(img_html);
