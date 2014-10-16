@@ -52,9 +52,10 @@ Capture Cross-Domain
 If you're hosting your djanalytics instance in a different domain than the site you're capturing,
 you will need to use a slightly different mechanism. Set up djanalytics on your server, and ensure
 it's got a url for the djanalytics_js view (included in the urls.py file). Then put the following
-javascript in your templates:
+HTML in your templates:
 
-    <script>
+    <div id="dja_tag"></div>
+    <script defer="defer">
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = 'https://dja_server.example.com/djanalytics.js' +
