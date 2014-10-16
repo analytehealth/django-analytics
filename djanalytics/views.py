@@ -120,27 +120,19 @@ class MinifiedJsTemplateResponse(TemplateResponse):
         return content
 
 
-class DjanalyticsJs(TemplateView, ValidatedViewMixin):
+class DjanalyticsJs(TemplateView):
 
     response_class = MinifiedJsTemplateResponse
     content_type = 'application/javascript'
-
-    def get(self, request, *args, **kwargs):
-        invalid_response = self.is_valid(request)
-
-        if invalid_response:
-            return invalid_response
-
-        if not self.client.ip_valid(self.client_ip):
-            return HttpResponse(content='', content_type=self.content_type)
-        return super(DjanalyticsJs, self).get(request, *args, **kwargs)
 
     def get_template_names(self):
         return ['djanalytics.js.min', 'djanalytics.js']
 
     def get_context_data(self, **kwargs):
+        parsed_url = urlparse(self.request.META.get('HTTP_REFERER', ''))
+        client_id = self.request.GET.get('dja_id')
         context_data = super(DjanalyticsJs, self).get_context_data(**kwargs)
-        tl_domain = '.'.join(self.parsed_url.netloc.split('.')[-2:])
+        tl_domain = '.'.join(parsed_url.netloc.split('.')[-2:])
         # the js will check for existing cookie values for uuid and tracking_id
         # and will only use the generated values below if cookie values
         # don't exist
@@ -149,7 +141,7 @@ class DjanalyticsJs(TemplateView, ValidatedViewMixin):
                 'uuid': models.generate_uuid(),
                 'tracking_id': models.generate_uuid(), 
                 'domain': '.%s' % tl_domain,
-                'dja_id': self.client.uuid,
+                'dja_id': client_id,
                 'capture_img_url': '%s%s' % (
                     self.request.META.get('HTTP_HOST', ''),
                     reverse_lazy('dja_capture')

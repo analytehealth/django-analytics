@@ -50,6 +50,12 @@ class TestDjanalyticsJs(TestCase):
                 'dja_id': 'bogus',
             }
         )
-        self.assertEqual(403, response.status_code)
-        self.assertNotIn('dja_tracking_id', response.client.session)
-        self.assertEqual('Client not found', response.content)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(self.uuid_regex.match(response.context['uuid']))
+        self.assertTrue(self.uuid_regex.match(response.context['tracking_id']))
+        self.assertEqual(response.context['domain'], '.example.com')
+        self.assertEqual(
+            response.context['capture_img_url'],
+            reverse('dja_capture')
+        )
+        self.assertEqual(response.context['dja_id'], 'bogus')
