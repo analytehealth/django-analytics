@@ -90,6 +90,9 @@ License
 
 Change Log
 ----------
+- 0.11.3
+  - Fix for issue #17 - ensure djanalytics.js is served regardless of where request comes from
+
 - 0.11.2
   - Fix for issue #16 - try to make sure all browsers work with djanalytics.js (IE8 had some issues)
 
