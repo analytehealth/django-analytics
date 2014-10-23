@@ -1,0 +1,71 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block meta %}
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+{% block title %}
+<title>Djanalytics</title>
+{% endblock %}
+{% block style %}
+<link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css" %}">
+{% endblock %}
+</head>
+<body>
+<div class="container">
+
+      {% block navigation %}
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Djanalytics</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">Audience Overview</a></li>
+                  <li><a href="#">Device Overview</a></li>
+                  <li><a href="#">Page Overview</a></li>
+                  <li><a href="#">Ecommerce Overview</a></li>
+                  <li><a href="#">Browser and OS Detail</a></li>
+                  <li><a href="#">Device Detail</a></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Charts <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#">User</a></li>
+                  <li><a href="#">Session</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </div>
+      {% endblock %}
+
+      {% block content %}
+      {% endblock %}
+
+    </div> <!-- /container -->
+{% block script %}
+<!-- Latest compiled and minified JavaScript -->
+<script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
+<script src="{% static "js/bootstrap.min.js" %}"></script>
+{% endblock %}
+</body>
+</html>
