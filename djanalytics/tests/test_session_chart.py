@@ -45,13 +45,13 @@ class TestSessionChart(BaseChartTest):
             ip_address=re.ip_address,
             tracking_key=re.tracking_key
         )
-        response = self.client.get(
+        response = self.client.post(
             reverse('session_chart', urlconf='djanalytics.charts.urls'),
             data = {
                 'start_date': (
                     datetime.datetime.now() - datetime.timedelta(days=5)
                 ).strftime('%Y-%m-%d'),
-                'client_id': self.dja_client.uuid,
+                'client': self.dja_client.uuid,
             }
         )
         self.assertEqual(response.status_code, 200)

@@ -21,10 +21,10 @@ class TestPageVisit(BaseChartTest):
                 path='/path1/' if i % 2 == 0 else '/path2/',
                 referrer='http://djanalytics.example.com/home/'
             )
-        response = self.client.get(
+        response = self.client.post(
             reverse('page_visit', urlconf='djanalytics.charts.urls'),
             data = {
-                'client_id': self.dja_client.uuid,
+                'client': self.dja_client.uuid,
             }
         )
         self.assertEqual(response.status_code, 200)

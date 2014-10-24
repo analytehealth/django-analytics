@@ -8,10 +8,12 @@ from urlparse import urlparse
 
 
 class Referrer(DateRangeChartView):
-    template_name = 'charts/referrer.html'
+    template_name = 'djanalytics/charts/referrer.html'
 
     def get_context_data(self, **kwargs):
         context_data = super(Referrer, self).get_context_data(**kwargs)
+        if not self.client:
+            return context_data
         referrer_query = models.RequestEvent.objects.filter(
             client=self.client,
             created__range=[self.start_date, self.end_date]

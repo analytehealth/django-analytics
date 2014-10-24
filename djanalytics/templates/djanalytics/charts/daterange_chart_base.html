@@ -1,0 +1,35 @@
+{% extends 'djanalytics/djanalytics_base.html' %}
+{% load staticfiles %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+{% endblock %}
+{% block content %}
+
+    {% block date_range_form %}
+        <form id="page_visit_form" method="POST">
+        {% csrf_token %}
+        {{ form }}
+
+        {% block extra_date_range_form_elements %}
+        {% endblock %}
+
+        <input type="submit">
+        </form>
+    {% endblock %}
+
+    {% block page_data %}
+    {% endblock %}
+
+{% endblock %}
+
+{% block foot_scripts %}
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript">
+$(function() {
+    $('#{{ form.start_date.id_for_label }}').datepicker({ dateFormat: 'yy-mm-dd' });
+    $('#{{ form.end_date.id_for_label }}').datepicker({ dateFormat: 'yy-mm-dd' });
+})
+</script>
+{% endblock %}

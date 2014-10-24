@@ -11,10 +11,12 @@ from djanalytics.charts.views.base import DateRangeChartView
 
 
 class SessionChart(DateRangeChartView):
-    template_name = 'charts/sessions.html'
+    template_name = 'djanalytics/charts/sessions.html'
 
     def get_context_data(self, **kwargs):
         context_data = super(SessionChart, self).get_context_data(**kwargs)
+        if not self.client:
+            return context_data
         data = [ ('Date', 'Sessions Created') ]
         date_dict = defaultdict(int)
         for row in models.RequestEvent.objects.values(

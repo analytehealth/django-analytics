@@ -22,10 +22,10 @@ class TestExitPage(BaseChartTest):
                 tracking_key=first_page.tracking_key,
                 tracking_user_id=first_page.tracking_user_id
             )
-        response = self.client.get(
+        response = self.client.post(
             reverse('exit_page', urlconf='djanalytics.charts.urls'),
             data = {
-                'client_id': self.dja_client.uuid,
+                'client': self.dja_client.uuid,
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -59,10 +59,10 @@ class TestExitPage(BaseChartTest):
             tracking_key=first_page.tracking_key,
             tracking_user_id=first_page.tracking_user_id,
         )
-        response = self.client.get(
+        response = self.client.post(
             reverse('exit_page', urlconf='djanalytics.charts.urls'),
             data = {
-                'client_id': self.dja_client.uuid,
+                'client': self.dja_client.uuid,
             }
         )
         self.assertEqual(response.status_code, 200)

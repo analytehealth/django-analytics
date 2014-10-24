@@ -11,10 +11,14 @@
 <title>Djanalytics</title>
 {% endblock %}
 {% block style %}
-<link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
 <!-- Optional theme -->
-<link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css" %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
+{% endblock %}
+{% block extra_style %}
+{% endblock %}
+{% block head_scripts %}
 {% endblock %}
 </head>
 <body>
@@ -48,8 +52,8 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Charts <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                  <li><a href="#">User</a></li>
-                  <li><a href="#">Session</a></li>
+                  <li><a href="{% url 'user_chart' %}">User</a></li>
+                  <li><a href="{% url 'session_chart' %}">Session</a></li>
                 </ul>
               </li>
             </ul>
@@ -66,6 +70,8 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
 <script src="{% static "js/bootstrap.min.js" %}"></script>
+{% endblock %}
+{% block foot_scripts %}
 {% endblock %}
 </body>
 </html>

@@ -8,10 +8,12 @@ from djanalytics.charts.views.base import DateRangeChartView
 
 
 class ExitPage(DateRangeChartView):
-    template_name = 'charts/exit_page.html'
+    template_name = 'djanalytics/charts/exit_page.html'
 
     def get_context_data(self, **kwargs):
         context_data = super(ExitPage, self).get_context_data(**kwargs)
+        if not self.client:
+            return context_data
         exit_page_data = defaultdict(int)
         sessions_query = models.RequestEvent.objects.values(
             'tracking_key'

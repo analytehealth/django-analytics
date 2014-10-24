@@ -4,25 +4,26 @@ from urlparse import urlparse
 from django.db.models import Count
 from django.utils.datastructures import SortedDict
 
-from djanalytics.charts.views.base import DateRangeChartView
 from djanalytics import models
+from djanalytics.charts.views.base import DateRangeChartView
+from djanalytics.charts.forms import PageViewChartForm
 
 
 class PageVisit(DateRangeChartView):
-    template_name = 'charts/page_visit.html'
-
-    def get(self, request, *args, **kwargs):
-        self.start_page = request.GET.get('start_page')
-        return super(PageVisit, self).get(request, *args, **kwargs)
+    template_name = 'djanalytics/charts/page_visit.html'
+    form_class = PageViewChartForm
 
     def get_context_data(self, **kwargs):
         context_data = super(PageVisit, self).get_context_data(**kwargs)
+        if not self.client:
+            return context_data
         query = models.RequestEvent.objects.filter(
             client=self.client,
             created__range=[self.start_date, self.end_date]
         )
-        if self.start_page:
-            query = query.filter(path=self.start_page)
+        start_page = self.form.cleaned_data.get('start_page')
+        if start_page:
+            query = query.filter(path=start_page)
         try:
             target_page = query.values('path').annotate(visits=Count('pk')).order_by('-visits')[0]
         except IndexError:
@@ -56,7 +57,7 @@ class PageVisit(DateRangeChartView):
         }
         context_data.update({
             'page_info': page_info,
-            'start_page': self.start_page or target_page['path'],
+            'start_page': start_page or target_page['path'],
         })
         return context_data
 

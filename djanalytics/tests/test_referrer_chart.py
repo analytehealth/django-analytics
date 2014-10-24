@@ -25,9 +25,9 @@ class TestReferrerChart(BaseChartTest):
             ip_address='1.1.1.77',
             referrer='http://%s/home/' % self.domain.pattern
         )
-        response = self.client.get(
+        response = self.client.post(
             reverse('referrer', urlconf='djanalytics.charts.urls'),
-            data={'client_id': self.dja_client.uuid}
+            data={'client': self.dja_client.uuid}
         )
         self.assertEquals(response.status_code, 200)
         referrer_data = response.context['referrer_data']

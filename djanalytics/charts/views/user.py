@@ -11,10 +11,12 @@ from djanalytics.charts.views.base import DateRangeChartView
 
 
 class UserChart(DateRangeChartView):
-    template_name = 'charts/users.html'
+    template_name = 'djanalytics/charts/users.html'
 
     def get_context_data(self, **kwargs):
         context_data = super(UserChart, self).get_context_data(**kwargs)
+        if not self.client:
+            return context_data
         data = [ ('Date', 'Users Created') ]
         date_dict = defaultdict(int)
         for row in models.RequestEvent.objects.values(
@@ -31,7 +33,7 @@ class UserChart(DateRangeChartView):
         chart = gchart.LineChart(SimpleDataSource(data=data))
         context_data.update(
             {
-                'chart': chart
+                'chart': chart,
             }
         )
         return context_data

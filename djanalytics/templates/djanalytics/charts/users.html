@@ -1,4 +1,4 @@
-{% extends 'charts/daterange_chart_base.html' %}
+{% extends 'djanalytics/charts/daterange_chart_base.html' %}
 
 {% block title %}
 <title>Users</title>
@@ -10,8 +10,9 @@
     google.load("visualization", "1", {packages:["corechart"]});
 </script>
 {% endblock %}
-</head>
 
 {% block page_data %}
+    {% if chart %}
     {{ chart.as_html }}
+    {% endif %}
 {% endblock %}
