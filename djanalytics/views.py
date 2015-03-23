@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 
 from datetime import datetime, timedelta
 from urlparse import urlparse
@@ -39,11 +40,19 @@ class ValidatedViewMixin(object):
         if not self.client.domain_set.exists():
             return HttpResponseBadRequest(content='No domains found for client')
 
-        domain_found = False
-        for domain in self.client.domain_set.all():
-            if re.match('.*%s$' % domain.pattern, origin, re.IGNORECASE):
-                domain_found = True
-                break
+        domain_found = self.client.domain_set.filter(name=origin).exists()
+        if not domain_found:
+            warnings.warn(
+                "Use of domain patterns will be removed in a future version.",
+                DeprecationWarning
+            )
+            for domain in self.client.domain_set.all():
+                if (
+                    domain.pattern and
+                    re.match('.*%s$' % domain.pattern, origin, re.IGNORECASE)
+                ):
+                    domain_found = True
+                    break
         if not domain_found:
             return HttpResponseForbidden(content='Invalid domain for client')
 

@@ -26,7 +26,7 @@ class TestReferrerChart(BaseChartTest):
             referrer='http://%s/home/' % self.domain.pattern
         )
         response = self.client.post(
-            reverse('referrer', urlconf='djanalytics.charts.urls'),
+            reverse('referrer'),
             data={'client': self.dja_client.uuid}
         )
         self.assertEquals(response.status_code, 200)

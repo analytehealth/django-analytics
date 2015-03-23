@@ -41,12 +41,12 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                  <li><a href="#">Audience Overview</a></li>
-                  <li><a href="#">Device Overview</a></li>
-                  <li><a href="#">Page Overview</a></li>
-                  <li><a href="#">Ecommerce Overview</a></li>
-                  <li><a href="#">Browser and OS Detail</a></li>
-                  <li><a href="#">Device Detail</a></li>
+                  <li><a href="{% url 'audience_overview' %}">Audience Overview</a></li>
+                  <li><a href="{% url 'device_overview' %}">Device Overview</a></li>
+                  <li><a href="{% url 'page_overview' %}">Page Overview</a></li>
+                  <li><a href="{% url 'ecommerce_overview' %}">Ecommerce Overview</a></li>
+                  <li><a href="{% url 'browser_detail' %}">Browser Detail</a></li>
+                  <li><a href="{% url 'device_detail' %}">Device Detail</a></li>
                 </ul>
               </li>
               <li class="dropdown">

@@ -8,4 +8,6 @@ class DomainInline(admin.TabularInline):
 
 
 class ClientAdmin(admin.ModelAdmin):
+    list_display = ('name', 'uuid')
+    readonly_fields = ('uuid', )
     inlines = [ DomainInline ]

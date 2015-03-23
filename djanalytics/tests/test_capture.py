@@ -1,3 +1,4 @@
+import warnings
 from mock import patch
 
 from django.test import TestCase
@@ -7,6 +8,7 @@ from djanalytics import models
 
 
 class TestCapture(TestCase):
+    urls = 'djanalytics.tests.urls'
 
     def setUp(self):
         super(TestCapture, self).setUp()
@@ -14,18 +16,18 @@ class TestCapture(TestCase):
             name='testclient'
         )
         models.Domain.objects.create(
-            pattern='djanalytics.example.com',
+            name='djanalytics.example.com',
             client=self.dja_client
         )
         models.Domain.objects.create(
-            pattern='djanalytics_too.example.com',
+            name='djanalytics_too.example.com',
             client=self.dja_client
         )
 
     def test_capture_get(self):
         # first request
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics_too.example.com:81',
@@ -55,7 +57,7 @@ class TestCapture(TestCase):
 
         # second request should have same tracking_id and tracking_user_id
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics_too.example.com',
@@ -86,7 +88,7 @@ class TestCapture(TestCase):
         self.client.cookies.pop('sessionid')
         # third request should still have same tracking_user_id
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
@@ -110,7 +112,7 @@ class TestCapture(TestCase):
         tracking_id = models.generate_uuid()
         tracking_user_id = models.generate_uuid()
         self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics_too.example.com:81',
@@ -134,7 +136,7 @@ class TestCapture(TestCase):
     def test_invalid_client_id(self):
         response = self.client.get(
             '%s?dja_id=%s' % (
-                reverse('dja_capture', urlconf='djanalytics.urls'),
+                reverse('dja_capture'),
                 'bogus'
             ),
             HTTP_REFERER='http://djanalytics.example.com',
@@ -145,7 +147,7 @@ class TestCapture(TestCase):
 
     def test_invalid_domain_id(self):
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_REFERER='http://bogus.example.com',
             data={
                 'dja_id': self.dja_client.uuid,
@@ -164,7 +166,7 @@ class TestCapture(TestCase):
             include=False,
         )
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
@@ -188,7 +190,7 @@ class TestCapture(TestCase):
             include=False,
         )
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com',
@@ -207,7 +209,7 @@ class TestCapture(TestCase):
 
     def test_no_referrer(self):
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             data={
@@ -228,7 +230,7 @@ class TestCapture(TestCase):
     @patch('django.conf.settings.USE_X_FORWARDED_HOST', True)
     def test_x_forwarded_header(self):
         response = self.client.get(
-            reverse('dja_capture', urlconf='djanalytics.urls'),
+            reverse('dja_capture'),
             HTTP_USER_AGENT='Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) '
                             'Gecko/20100101 Firefox/29.0',
             HTTP_REFERER='http://djanalytics.example.com:81',
@@ -247,3 +249,29 @@ class TestCapture(TestCase):
             tracking_key=tracking_id,
             tracking_user_id=tracking_user_id)
         self.assertEqual('192.168.254.254', event.ip_address)
+
+    def test_domain_pattern_deprecated(self):
+        models.Domain.objects.create(
+            pattern="example.com",
+            client=self.dja_client
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")  # always trigger warnings
+            response = self.client.get(
+                reverse('dja_capture'),
+                HTTP_REFERER='http://regex.example.com',
+                data={
+                    'dja_id': self.dja_client.uuid,
+                    'qs': 'query_key=query_value',
+                    'pth': '/'
+                }
+            )
+            self.assertEqual(len(w), 1, "Expected 1 deprecation warning")
+            warning = w[0]
+            self.assertEqual(warning.category, DeprecationWarning)
+            self.assertEqual(
+                warning.message.message,
+                "Use of domain patterns will be removed in a future version."
+            )
+        self.assertEqual(response.status_code, 201)
+

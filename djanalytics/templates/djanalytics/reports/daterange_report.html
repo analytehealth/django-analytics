@@ -1,0 +1,166 @@
+{% extends 'djanalytics/djanalytics_base.html' %}
+{% load staticfiles %}
+
+{% block title %}<title>{{ report_name }}</title>{% endblock %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}"
+      xmlns="http://www.w3.org/1999/html">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+<style type="text/css">
+    table.tablesorter {
+        font-family:arial;
+        background-color: #CDCDCD;
+        margin:10px 0pt 15px;
+        font-size: 8pt;
+        width: 100%;
+        text-align: left;
+    }
+    table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+        background-color: #e6EEEE;
+        border: 1px solid #FFF;
+        font-size: 8pt;
+        padding: 4px;
+    }
+    table.tablesorter thead tr .header {
+        background-image: url("{% static 'img/bg.gif' %}");
+        background-repeat: no-repeat;
+        background-position: center right;
+        cursor: pointer;
+    }
+    table.tablesorter tbody td {
+        color: #3D3D3D;
+        padding: 4px;
+        background-color: #FFF;
+        vertical-align: top;
+    }
+    table.tablesorter tbody tr.odd td {
+        background-color:#F0F0F6;
+    }
+    table.tablesorter tbody tr.total td {
+        background-color: #ffffff;
+        font-weight: bold;
+    }
+    table.tablesorter thead tr .headerSortUp {
+        background-image: url("{% static 'img/asc.gif' %}");
+    }
+    table.tablesorter thead tr .headerSortDown {
+        background-image: url("{% static 'img/desc.gif' %}");
+    }
+    table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+        background-color: #8dbdd8;
+    }
+    div.tablesorterPager {
+        padding: 10px 0 10px 0;
+        background-color: #D6D2C2;
+        text-align: center;
+    }
+    div.tablesorterPager span {
+        padding: 0 5px 0 5px;
+    }
+    div.tablesorterPager input.prev {
+        width: auto;
+        margin-right: 10px;
+    }
+    div.tablesorterPager input.next {
+        width: auto;
+        margin-left: 10px;
+    }
+    div.tablesorterPager input {
+        font-size: 8px;
+        width: 50px;
+        border: 1px solid #330000;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+    <h1>{{ report_name }}</h1>
+    {% block date_range_form %}
+        <form id="page_visit_form" method="POST">
+        {% csrf_token %}
+        {{ form }}
+
+        {% block extra_date_range_form_elements %}
+        {% endblock %}
+
+        <input type="submit">
+        </form>
+    {% endblock %}
+    <br />
+
+    {% if data %}
+        <table id="dataTable" class="tablesorter">
+            <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in data %}
+                {% if not forloop.last %}
+                <tr>
+                    {% for column in row %}
+                        <td>{{ column }}</td>
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+            {% comment %}Need a second tbody to avoid sorting total row{% endcomment %}
+            <tbody>
+            {% for row in data %}
+                {% if forloop.last %}
+                <tr class="total">
+                    {% for column in row %}
+                        <td>{{ column }}</td>
+                    {% endfor %}
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <div id="pager" class="pager">
+            <form>
+                <img src="{% static 'img/first.png' %}" class="first"/>
+                <img src="{% static 'img/prev.png' %}" class="prev"/>
+                <input type="text" class="pagedisplay"/>
+                <img src="{% static 'img/next.png' %}" class="next"/>
+                <img src="{% static 'img/last.png' %}" class="last"/>
+                <select class="pagesize">
+                        <option selected="selected"  value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option  value="40">40</option>
+                </select>
+            </form>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block foot_scripts %}
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.pager.js' %}"></script>
+<script type="text/javascript">
+$(function() {
+    $('#{{ form.start_date.id_for_label }}').datepicker({ dateFormat: 'yy-mm-dd' });
+    $('#{{ form.end_date.id_for_label }}').datepicker({ dateFormat: 'yy-mm-dd' });
+})
+$(document).ready(function() {
+    $("#dataTable")
+    .tablesorter(
+        {
+            widthFixed: true,
+            widgets: ['zebra']{% if sort_column %},
+            sortList: [[{{ sort_column}}, {{ sort_order }}]]{% endif %}
+        }
+    )
+    .tablesorterPager({container: $("#pager")});
+})
+</script>
+{% endblock %}

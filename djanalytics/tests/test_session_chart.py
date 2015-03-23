@@ -46,7 +46,7 @@ class TestSessionChart(BaseChartTest):
             tracking_key=re.tracking_key
         )
         response = self.client.post(
-            reverse('session_chart', urlconf='djanalytics.charts.urls'),
+            reverse('session_chart'),
             data = {
                 'start_date': (
                     datetime.datetime.now() - datetime.timedelta(days=5)

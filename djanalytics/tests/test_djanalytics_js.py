@@ -6,6 +6,7 @@ from djanalytics import models
 from django.core.urlresolvers import reverse
 
 class TestDjanalyticsJs(TestCase):
+    urls = 'djanalytics.tests.urls'
 
     def setUp(self):
         super(TestDjanalyticsJs, self).setUp()
@@ -26,7 +27,7 @@ class TestDjanalyticsJs(TestCase):
 
     def test_djanalytics_js_get(self):
         response = self.client.get(
-            reverse('djanalytics_js', urlconf='djanalytics.urls'),
+            reverse('djanalytics_js'),
             HTTP_REFERER='http://djanalytics_too.example.com',
             data={
                 'dja_id': self.dja_client.uuid,
@@ -44,7 +45,7 @@ class TestDjanalyticsJs(TestCase):
 
     def test_invalid_client(self):
         response = self.client.get(
-            reverse('djanalytics_js', urlconf='djanalytics.urls'),
+            reverse('djanalytics_js'),
             HTTP_REFERER='http://djanalytics_too.example.com',
             data={
                 'dja_id': 'bogus',

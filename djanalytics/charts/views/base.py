@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.views.generic import FormView
 
-from djanalytics.reports.forms import DateRangeForm
+from djanalytics.charts.forms import DateRangeForm
 
 try:
     import pytz

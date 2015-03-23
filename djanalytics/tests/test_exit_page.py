@@ -23,7 +23,7 @@ class TestExitPage(BaseChartTest):
                 tracking_user_id=first_page.tracking_user_id
             )
         response = self.client.post(
-            reverse('exit_page', urlconf='djanalytics.charts.urls'),
+            reverse('exit_page'),
             data = {
                 'client': self.dja_client.uuid,
             }
@@ -60,7 +60,7 @@ class TestExitPage(BaseChartTest):
             tracking_user_id=first_page.tracking_user_id,
         )
         response = self.client.post(
-            reverse('exit_page', urlconf='djanalytics.charts.urls'),
+            reverse('exit_page'),
             data = {
                 'client': self.dja_client.uuid,
             }

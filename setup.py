@@ -9,7 +9,7 @@ except ImportError:
     from setuptools import setup, find_packages
 from setuptools_utils import minify
 
-version = '0.11.3'
+version = '1.0'
 
 setup(
     name='dj-analytics',
@@ -22,10 +22,16 @@ setup(
     packages=find_packages(exclude=('*.tests',)),
     package_data={
         'djanalytics': [
-            'templates/charts/*',
+            'templates/djanalytics/*.html',
+            'templates/djanalytics/charts/*',
+            'templates/djanalytics/reports/*',
             'templates/*png',
             'templates/*js',
             'templates/*min',
+            'static/css/*',
+            'static/fonts/*',
+            'static/img/*',
+            'static/js/*',
         ],
     },
     description='Django app to capture, track and display site analytics',
@@ -35,6 +41,7 @@ setup(
         'python-dateutil',
         'django-graphos==0.0.2a0',
         'pytz',
+        'user-agents>=0.3.0',
         'jsmin>=2.0.6',
     ],
     cmdclass={'minify': minify},

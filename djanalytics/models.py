@@ -6,6 +6,18 @@ from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 
+from .reports.models import (
+    DeviceType,
+    Device,
+    Page,
+    PagePattern,
+    PageType,
+    PageVisit,
+    ReferrerType,
+    Visitor,
+    Visit,
+)
+
 def generate_uuid():
     '''Generate a nice unique number (str).'''
     return str(uuid.uuid4())
@@ -13,7 +25,7 @@ def generate_uuid():
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
-    uuid = models.CharField(max_length=36, default=generate_uuid())
+    uuid = models.CharField(max_length=36, default=generate_uuid)
 
     def ip_valid(self, ip_address):
         return self._valid('ipfilter_set', ip_address)
@@ -38,9 +50,9 @@ class Client(models.Model):
         )
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name, self.uuid)
+        return u'%s' % self.name
 
-    class Meta(object):
+    class Meta:
         app_label = 'djanalytics'
 
 
@@ -83,8 +95,12 @@ class Location(models.Model):
 class RequestEvent(models.Model):
     ip_address = models.IPAddressField(db_index=True)
     user_agent = models.TextField(null=True, blank=True)
-    tracking_key = models.CharField(max_length=36, default=generate_uuid)
-    tracking_user_id = models.CharField(max_length=36, default=generate_uuid)
+    tracking_key = models.CharField(
+        max_length=36, default=generate_uuid, db_index=True
+    )
+    tracking_user_id = models.CharField(
+        max_length=36, default=generate_uuid, db_index=True
+    )
     protocol = models.CharField(max_length=10)
     domain = models.CharField(max_length=100, db_index=True)
     path = models.URLField(blank=True, db_index=True)
@@ -100,20 +116,37 @@ class RequestEvent(models.Model):
 
     objects = RequestEventManager()
 
-    class Meta(object):
+    class Meta:
         app_label = 'djanalytics'
         get_latest_by = 'created'
 
 
 class Domain(models.Model):
-    pattern = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    pattern = models.CharField(
+        max_length=100, null=True, blank=True,
+        help_text="Deprecated, use an entry with name per domain instead",
+    )
     client = models.ForeignKey(Client)
+    web_property = models.ForeignKey('WebProperty', null=True)
 
     def __unicode__(self):
-        return '%s: %s' % (self.client.name, self.pattern)
+        return '%s (%s)' % (self.name, self.web_property)
 
-    class Meta(object):
+    class Meta:
         app_label = 'djanalytics'
+
+
+class WebProperty(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100)
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+    class Meta:
+        app_label = 'djanalytics'
+        verbose_name_plural = "Web properties"
 
 
 class IPFilter(models.Model):
@@ -130,7 +163,7 @@ class IPFilter(models.Model):
     def __unicode__(self):
         return '%s: %s' % (self.client.name, self.netmask)
 
-    class Meta(object):
+    class Meta:
         app_label = 'djanalytics'
 
 
@@ -147,6 +180,6 @@ class PathFilter(models.Model):
     def __unicode__(self):
         return '%s: %s' % (self.client.name, self.path_pattern)
 
-    class Meta(object):
+    class Meta:
         app_label = 'djanalytics'
 

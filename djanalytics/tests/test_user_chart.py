@@ -46,7 +46,7 @@ class TestUserChart(BaseChartTest):
             tracking_user_id=re.tracking_user_id
         )
         response = self.client.post(
-            reverse('user_chart', urlconf='djanalytics.charts.urls'),
+            reverse('user_chart'),
             data = {
                 'start_date': (
                     datetime.datetime.now() - datetime.timedelta(days=5)

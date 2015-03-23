@@ -1,20 +1,30 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
 from djanalytics import models
 
 
-class ClientModelChoiceField(forms.ModelChoiceField):
+class DateRangeReportForm(forms.Form):
 
-    def label_from_instance(self, obj):
-        return obj.name
-
-
-class DateRangeForm(forms.Form):
-
-    client = ClientModelChoiceField(
+    client = forms.ModelChoiceField(
         queryset=models.Client.objects.all(),
-        empty_label=None,
-        to_field_name='uuid',
+        required=False,
+    )
+    web_property = forms.ModelChoiceField(
+        queryset=models.WebProperty.objects.all(),
+        required=False,
     )
     start_date = forms.DateField(required=False)
     end_date = forms.DateField(required=False)
+    format = forms.ChoiceField(choices=(('html', 'HTML'), ('csv', 'CSV')))
 
+    def clean(self):
+        if self.cleaned_data['client'] or self.cleaned_data['web_property']:
+            return self.cleaned_data
+        raise ValidationError('Select either a client or a web property.')
+
+
+class DeviceDetailReportForm(DateRangeReportForm):
+    device_type = forms.ModelChoiceField(
+        queryset=models.DeviceType.objects.all(),
+    )

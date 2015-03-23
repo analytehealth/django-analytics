@@ -5,7 +5,7 @@ from djanalytics import models
 
 class BaseChartTest(TestCase):
 
-    urls = 'djanalytics.charts.urls'
+    urls = 'djanalytics.tests.urls'
 
     def setUp(self):
         super(BaseChartTest, self).setUp()

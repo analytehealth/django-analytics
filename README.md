@@ -9,10 +9,24 @@ Install
 -------
 pip install dj-analytics
 
-Add to django configuration
+Add to django configuration (before 1.7)
 ---------------------------
 * Add `djanalytics` to `INSTALLED_APPS` in settings.py file.
 * Run `manage.py migrate djanalytics` to create database tables.
+
+Add to django configuration (1.7+)
+---------------------------
+* Add `djanalytics` to `INSTALLED_APPS` in settings.py file.
+* Point at correct migration module:
+
+    MIGRATION_MODULES = {
+        'djanalytics': 'djanalytics.django_migrations'
+    }
+
+* Run `manage.py migrate djanalytics` to create database tables.
+
+Configure
+---------
 * Create and configure at least one Client and Domain.
 * If you're capturing using HTML, in your urls.py, include djanalytics urls. For example:
 
@@ -24,6 +38,10 @@ Add to django configuration
 * For charts, include the charts urls:
 
     urlpatterns += patterns('', (r'^analytics/', include='djanalytics.charts.urls'))
+
+* For reports, include the reports urls:
+
+    urlpatterns += patterns('', (r'^analytics/', include='djanalytics.reports.urls'))
 
 Capture using middleware
 --------------
@@ -84,12 +102,44 @@ Filtering Paths
 The PathFilter model allows you to include or exclude path patterns. PathFilters use regex to determine
 a match on the path.
 
+Reporting
+---------
+
+### Generating report data
+
+A management command, _collect_reporting_stats_, will generate report data. This command should
+most likely be run on a schedule (cron). It takes a few arguments:
+
+* -s, --start - Date of earliest RequestEvent to process. This is optional. If omitted, the command will
+not set a beginning time when searching for RequestEvents.
+* -e, --end - Date of latest RequestEvent to process. This is optional. If omitted, the command will
+not set an end time when searching for RequestEvents.
+* -a, --max-age - This is used when calculation visit durations as well as visit durations,
+conversions and exit pages. This argument defaults to 30 days.
+
+### Conversion Tracking
+
+In order to track conversions, you'll need to define page patterns for the FUNNEL and CONVERSION
+page types. Conversions are defined by a page visit to at least one FUNNEL page followed by
+a page visit to a CONVERSION page.
+
 License
 -------
 [Read it here](https://raw.githubusercontent.com/analytehealth/django-analytics/master/LICENSE)
 
 Change Log
 ----------
+- 1.0
+  - Modeling for analytics reporting (#25)
+  - Adding a number of reports:
+    - #19 - Audience Overview Report
+    - #20 - Device Overview Report
+    - #21 - Browser and OS Detail Report
+    - #22 - Page Overview Report
+    - #23 - Ecommerce Overview Report
+    - #24 - Device Detail Report
+  - Added management command to collect data into reporting model (#26)
+
 - 0.11.3
   - Fix for issue #17 - ensure djanalytics.js is served regardless of where request comes from
 

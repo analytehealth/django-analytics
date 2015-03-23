@@ -22,7 +22,7 @@ class TestPageVisit(BaseChartTest):
                 referrer='http://djanalytics.example.com/home/'
             )
         response = self.client.post(
-            reverse('page_visit', urlconf='djanalytics.charts.urls'),
+            reverse('page_visit'),
             data = {
                 'client': self.dja_client.uuid,
             }

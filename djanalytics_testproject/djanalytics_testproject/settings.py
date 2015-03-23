@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import django
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -40,15 +41,24 @@ INSTALLED_APPS = (
     'graphos',
 )
 
+# south is no longer used in django 1.7
+if django.VERSION[1] < 7:
+    INSTALLED_APPS = INSTALLED_APPS + ( 'south', )
+else:
+    MIGRATION_MODULES = {
+        'djanalytics': 'djanalytics.django_migrations'
+    }
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+if django.VERSION[1] >= 7:
+    MIDDLEWARE_CLASSES += ('django.contrib.auth.middleware.SessionAuthenticationMiddleware',)
 
 ROOT_URLCONF = 'djanalytics_testproject.urls'
 
@@ -63,6 +73,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    # 'default': {
+    #     'NAME': 'analytics',
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'STORAGE_ENGINE': 'InnoDB',
+    #     'USER': 'root',
+    #     'PASSWORD': 'root',
+    # }
 }
 
 # Internationalization
