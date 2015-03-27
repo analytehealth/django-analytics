@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
 from mock import Mock
+from os import path
 
 from django.test.testcases import TestCase
 
@@ -126,6 +128,36 @@ class TestCollectReportingStatsCommand(TestCase):
         self.assertEqual(visit.last_page.path, '/page_three/123/')
         self.assertEqual(visit.first_page.path, '/page_one')
  
+    def test_collect_non_ascii_user_agent(self):
+        tracking_key = models.generate_uuid()
+        tracking_user_id = models.generate_uuid()
+        f = open(
+            path.join(
+                path.dirname(path.abspath(__file__)),
+                'unicode_user_agent.txt'
+            )
+        )
+        user_agent = f.read()
+        f.close()
+        models.RequestEvent.objects.create(
+            ip_address='127.0.0.1',
+            user_agent=user_agent,
+            tracking_key=tracking_key,
+            tracking_user_id=tracking_user_id,
+            protocol='http',
+            domain='djanalytics.example.com',
+            path='page',
+            query_string='',
+            method='GET',
+            client=self.dja_client,
+        )
+        command = Command()
+        command.stdout = Mock()
+        try:
+            command.handle()
+        except UnicodeEncodeError:
+            self.fail()
+  
     def test_max_age(self):
         freezer = freeze_time(datetime.now() - timedelta(days=15))
         freezer.start()

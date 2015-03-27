@@ -108,7 +108,7 @@ class Command(BaseCommand):
                 created_page_visits = []
             user_agent_md5 = device = None
             if request_event.user_agent:
-                user_agent_md5 = md5(request_event.user_agent).hexdigest()
+                user_agent_md5 = md5(request_event.user_agent.encode('utf-8')).hexdigest()
                 device = device_cache.get(user_agent_md5)
             if user_agent_md5 and not device:
                 user_agent = parse(request_event.user_agent)
