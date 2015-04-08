@@ -2,6 +2,7 @@ import re
 
 from collections import defaultdict, namedtuple
 from datetime import datetime, timedelta
+from dateutil.parser import parse as dt_parse
 from hashlib import md5
 from optparse import make_option
 
@@ -11,7 +12,6 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import reset_queries
 from django.db.models.aggregates import Sum, Count
-from django.utils.dateparse import parse_date
 
 from djanalytics import models
 
@@ -70,10 +70,10 @@ class Command(BaseCommand):
             'domain__in': web_property_cache.keys(),
         }
         if start:
-            start = parse_date(start)
+            start = dt_parse(start)
             query_dict['created__gte'] = start
         if end:
-            end = parse_date(end)
+            end = dt_parse(end)
             query_dict['created__lte'] = end
 
         query = models.RequestEvent.objects.filter(
