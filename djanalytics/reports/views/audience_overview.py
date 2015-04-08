@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from django.db.models import Count
 from django.utils.datastructures import SortedDict
 
 from .base import DateRangeReportView
@@ -15,24 +14,20 @@ class AudienceOverviewReport(DateRangeReportView):
         tmp_data = SortedDict()
         totals = defaultdict(int)
 
-        visits = self.visit_queryset().annotate(
-            page_count=Count('pages'),
-            visit_count=Count('visitor__visit')
-        ).values(
-            'visit_date', 'page_count', 'visit_count', 'duration'
-        ).order_by('visit_date')
+        visits = self.visit_queryset().order_by('visit_date')
         for visit in visits:
             # ideally this would be done in the database
             # but grouping really isn't a thing Django does well
-            date = visit["visit_date"]
+            date = visit.visit_date
             if date not in tmp_data:
                 tmp_data[date] = defaultdict(int)
             tmp_data[date]['visits'] += 1
-            tmp_data[date]['pageviews'] += visit['page_count']
-            tmp_data[date]['duration'] += visit['duration'] or 0
-            if visit['page_count'] == 1:
+            page_visits = visit.pagevisit_set.count()
+            tmp_data[date]['pageviews'] += page_visits
+            tmp_data[date]['duration'] += visit.duration or 0
+            if page_visits == 1:
                 tmp_data[date]['bounces'] += 1
-            if visit['visit_count'] > 1:
+            if visit.visitor.visit_set.count() > 1:
                 tmp_data[date]['returning_visits'] += 1
             else:
                 tmp_data[date]['new_visits'] += 1

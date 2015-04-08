@@ -1,7 +1,5 @@
 from collections import defaultdict
 
-from django.db.models import Count
-
 from .base import DateRangeReportView
 from djanalytics.models import DeviceType
 from djanalytics.reports import utils
@@ -16,21 +14,19 @@ class BaseDeviceReport(DateRangeReportView):
         data = []
         tmp_data = {}
         totals = defaultdict(int)
-        visits = self.visit_queryset().annotate(
-            page_count=Count('pages'),
-            visit_count=Count('visitor__visit')
-        ).select_related('device')
+        visits = self.visit_queryset().select_related('device')
         for visit in visits:
             device_group = self._device_group(visit.device)
             if device_group not in tmp_data:
                 tmp_data[device_group] = defaultdict(int)
             tmp_data[device_group]['visits'] += 1
-            tmp_data[device_group]['pageviews'] += visit.page_count
+            page_visits = visit.pagevisit_set.count()
+            tmp_data[device_group]['pageviews'] += page_visits
             tmp_data[device_group]['duration'] += visit.duration or 0
             tmp_data[device_group]['conversions'] += visit.conversion_count
-            if visit.page_count == 1:
+            if page_visits == 1:
                 tmp_data[device_group]['bounces'] += 1
-            if visit.visit_count > 1:
+            if visit.visitor.visit_set.count() > 1:
                 tmp_data[device_group]['returning_visits'] += 1
             else:
                 tmp_data[device_group]['new_visits'] += 1

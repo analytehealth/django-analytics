@@ -129,6 +129,10 @@ License
 
 Change Log
 ----------
+- 1.0.3
+  - Fix for issue #28 - Page and visit counts are incorrect on some reports
+- 1.0.2
+  - Change from django date_parse to dateutil.parser for datetime parsing in collect_reporting_stats command
 - 1.0.1
   - Fix for issue #27 - User-agents with non-ascii characters cause collect_reporting_stats command to fail
 - 1.0
