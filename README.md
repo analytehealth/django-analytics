@@ -131,6 +131,7 @@ Change Log
 ----------
 - 1.0.3
   - Fix for issue #28 - Page and visit counts are incorrect on some reports
+  - Limiting django versions to <= 1.7 until issue with django-nose is resolved (https://github.com/django-nose/django-nose/issues/186)
 - 1.0.2
   - Change from django date_parse to dateutil.parser for datetime parsing in collect_reporting_stats command
 - 1.0.1
