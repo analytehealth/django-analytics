@@ -129,6 +129,9 @@ License
 
 Change Log
 ----------
+- 1.0.4
+  - Fix for issue #29 - Visits are being over-reported on Device Detail and Browser Detail reports
+  - Adding support for django 1.8 (removing django-nose requirement)
 - 1.0.3
   - Fix for issue #28 - Page and visit counts are incorrect on some reports
   - Limiting django versions to <= 1.7 until issue with django-nose is resolved (https://github.com/django-nose/django-nose/issues/186)

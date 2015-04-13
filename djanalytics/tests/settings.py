@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_nose',
+#    'django_nose',
     'djanalytics',
     'graphos'
 ]
@@ -86,6 +86,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 DJA_CLIENT_ID = 'test'
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+    },
+    'loggers': {
+        'djanalytics': {
+            'handlers': ['null'],
+            'level': 'ERROR'
+        },
+    }
+}

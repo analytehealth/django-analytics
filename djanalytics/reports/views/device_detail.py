@@ -14,7 +14,7 @@ class BaseDeviceReport(DateRangeReportView):
         data = []
         tmp_data = {}
         totals = defaultdict(int)
-        visits = self.visit_queryset().select_related('device')
+        visits = self.visit_queryset().select_related('device').distinct()
         for visit in visits:
             device_group = self._device_group(visit.device)
             if device_group not in tmp_data:

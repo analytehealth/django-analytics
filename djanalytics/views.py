@@ -7,6 +7,8 @@ from urlparse import urlparse
 
 import jsmin
 
+import django
+
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.http.response import (
@@ -121,8 +123,12 @@ class MinifiedJsTemplateResponse(TemplateResponse):
     def rendered_content(self):
         """Returns a 'minified' version of the javascript content"""
         template = self.resolve_template(self.template_name)
-        if template.name.endswith('.min'):
-            return super(MinifiedJsTemplateResponse, self).rendered_content
+        if django.VERSION[1] < 8:
+            if template.name.endswith('.min'):
+                return super(MinifiedJsTemplateResponse, self).rendered_content
+        else:
+            if template.template.name.endswith('.min'):
+                return super(MinifiedJsTemplateResponse, self).rendered_content
         # if no minified template exists, minify the response
         content = super(MinifiedJsTemplateResponse, self).rendered_content
         content = jsmin.jsmin(content)
