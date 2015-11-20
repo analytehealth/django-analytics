@@ -26,7 +26,7 @@ class TestCollectReportingStatsCommand(TestCase):
             client=self.dja_client,
             web_property=self.dja_property,
         )
-        funnel_type = models.PageType.objects.create(
+        funnel_type, created = models.PageType.objects.get_or_create(
             code=models.PageType.FUNNEL
         )
         models.PagePattern.objects.create(
@@ -42,9 +42,11 @@ class TestCollectReportingStatsCommand(TestCase):
             page_type=funnel_type,
             client=self.dja_client
         )
-        checkout_type = models.PageType.objects.create(
+        checkout_type, created = models.PageType.objects.get_or_create(
             code=models.PageType.CONVERSION,
-            name='Checkout'
+            defaults={
+                'name': 'Checkout'
+            }
         )
         models.PagePattern.objects.create(
             name='Conversion',

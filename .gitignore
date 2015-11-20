@@ -7,3 +7,5 @@ build
 dj_analytics.egg-info
 djanalytics/templates/*min
 .settings
+.project
+.pydevproject

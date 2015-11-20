@@ -45,6 +45,8 @@ INSTALLED_APPS = [
 # south is no longer used in django 1.7
 if django.VERSION[1] < 7:
     INSTALLED_APPS += [ 'south' ]
+else:
+    MIGRATION_MODULES={'djanalytics': 'djanalytics.django_migrations'}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

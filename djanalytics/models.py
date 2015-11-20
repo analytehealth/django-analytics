@@ -93,7 +93,7 @@ class Location(models.Model):
     country = models.CharField(max_length=100, blank=True, null=True)
 
 class RequestEvent(models.Model):
-    ip_address = models.IPAddressField(db_index=True)
+    ip_address = models.GenericIPAddressField(db_index=True)
     user_agent = models.TextField(null=True, blank=True)
     tracking_key = models.CharField(
         max_length=36, default=generate_uuid, db_index=True
