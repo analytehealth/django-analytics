@@ -1,9 +1,9 @@
-from _collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from djanalytics.charts.views.base import DateRangeChartView
 from djanalytics import models
 from django.db.models.aggregates import Count
-from django.utils.datastructures import SortedDict
+
 from urlparse import urlparse
 
 
@@ -34,7 +34,7 @@ class Referrer(DateRangeChartView):
                     parse_result.scheme, parse_result.netloc, path
                 )
             ] += data['referrals']
-        referrer_data = SortedDict(
+        referrer_data = OrderedDict(
             sorted(referrer_data.items(), key=lambda x: x[1], reverse=True)
         )
         context_data['referrer_data'] = referrer_data

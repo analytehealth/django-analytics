@@ -1,6 +1,4 @@
-from collections import defaultdict
-
-from django.utils.datastructures import SortedDict
+from collections import defaultdict, OrderedDict
 
 from .base import DateRangeReportView
 from djanalytics.reports import utils
@@ -11,7 +9,7 @@ class AudienceOverviewReport(DateRangeReportView):
 
     def _build_report_data(self):
         data = []
-        tmp_data = SortedDict()
+        tmp_data = OrderedDict()
         totals = defaultdict(int)
 
         visits = self.visit_queryset().order_by('visit_date')

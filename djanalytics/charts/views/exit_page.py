@@ -1,7 +1,6 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.db.models import Min
-from django.utils.datastructures import SortedDict
 
 from djanalytics import models
 from djanalytics.charts.views.base import DateRangeChartView
@@ -30,7 +29,7 @@ class ExitPage(DateRangeChartView):
             if exit_page_row['tracking_key'] in sessions:
                 exit_page_data[exit_page_row['path']] += 1
                 sessions.pop(sessions.index(exit_page_row['tracking_key']))
-        exit_page_data = SortedDict(
+        exit_page_data = OrderedDict(
             sorted(exit_page_data.items(), key=lambda x: x[1], reverse=True)
         )
         context_data.update({

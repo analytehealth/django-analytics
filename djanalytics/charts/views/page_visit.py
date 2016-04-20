@@ -1,8 +1,7 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from urlparse import urlparse
 
 from django.db.models import Count
-from django.utils.datastructures import SortedDict
 
 from djanalytics import models
 from djanalytics.charts.views.base import DateRangeChartView
@@ -41,7 +40,7 @@ class PageVisit(DateRangeChartView):
                     parsed_url.scheme, parsed_url.netloc, parsed_url.path
                 )
             parent_pages[key] += 1
-        parent_pages = SortedDict(
+        parent_pages = OrderedDict(
             sorted(parent_pages.items(), key=lambda x: x[1], reverse=True)
         )
         child_pages = models.RequestEvent.objects.filter(

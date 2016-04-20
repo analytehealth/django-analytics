@@ -1,5 +1,6 @@
+from collections import OrderedDict
+
 from django.db.models import Count
-from django.utils.datastructures import SortedDict
 
 from djanalytics import models
 
@@ -16,7 +17,7 @@ class DeviceOverviewReport(DateRangeReportView):
     )
 
     def _build_report_data(self):
-        tmp_data = SortedDict()
+        tmp_data = OrderedDict()
         totals = ['Totals'] + [0] * len(self.DEVICE_TYPES)
 
         visit_counts = self.visit_queryset().values(

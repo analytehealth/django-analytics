@@ -1,9 +1,8 @@
 import re
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from django.db.models import Count, Sum
-from django.utils.datastructures import SortedDict
 
 from djanalytics import models
 from djanalytics.reports import utils
@@ -65,7 +64,7 @@ class PageOverviewReport(DateRangeReportView):
             'last_page__path'
         ).annotate(Count('uuid'))
 
-        tmp_data = SortedDict()
+        tmp_data = OrderedDict()
         totals = defaultdict(int)
         pageview_idx = self._build_report_headers().index('Pageviews')
         uniqueview_idx = self._build_report_headers().index('Unique Pageviews')
