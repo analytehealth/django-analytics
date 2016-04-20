@@ -6,9 +6,9 @@ from djanalytics import models
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + (
+    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
         'djanalytics.middleware.CrossDomainMiddleware',
-    )
+    ]
 )
 class TestCrossDomainMiddleware(TestCase):
 
